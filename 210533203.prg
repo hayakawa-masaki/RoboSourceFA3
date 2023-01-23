@@ -841,7 +841,7 @@
 841     '背面板を置く
 842 '    Wait M_In(11889) = 1        'ねじロボ2停止2受信
 843     ColChk Off
-844     Mov PPlateBackSet_12        '背面板置き上空
+844     Mov PPlateBackSet_13        '背面板置き上空
 845     Cnt 1 , 10
 846 '
 847     MRtn = frInCheck(11272,1,MSETTIMEOUT05&)        'もう一度背面パネルチェック
@@ -868,2587 +868,2649 @@
 868 '    If MRtn = 0 Then Mov PInitialPosition    '"イニシャルに戻る動き"
 869     If MRtn = 0 Then GoTo *ASSY_ERROR_END
 870 '
-871 '    Mov PPlateBackSet_11        '経路1
-872     Ovrd 50
-873 '    Mov PPlateBackSet_10        '経路2
-874 '    Mov PPlateBackSet_9         '経路3
-875 '    Mov PPlateBackSet_8         '経路4
-876 '    Mov PPlateBackSet_7         '経路5
-877     Mov PPlateBackSet_6         '経路6
-878     Cnt 0
-879     Ovrd 25
-880     Mvs PPlateBackSet_5         '経路7
-881     Mvs PPlateBackSet_4         '経路8
-882     Mov PPlateBackSet_3         '経路9
-883     Mov PPlateBackSet_2         '経路10
-884     Mov PPlateBackSet_1         '経路11
-885     Mov PPlateBackSet           '背面板置き位置
-886     *RE_PLATE_SET
-887     M_Out(12256) = 0            '本体チャック閉OFF
-888     M_Out(12257) = 1            '本体チャック開ON
-889     '
-890 '    Wait M_In(11265)            '本体チャック開検出
-891     MRtn = frInCheck(11265,1,MSETTIMEOUT05&)   '本体チャック開検出
-892     If MRtn = 1 Then GoTo *CompPlateSet
-893     fErrorProcess(11,244,284,0)
-894     If M_20# = MNext% Then M_20# = MClear%
-895     If M_20# = MAbout% Then GoTo *ASSY_ERROR_END
-896     If M_20# = MNgProcess% Then GoTo *ASSY_ERROR_END
-897     If M_20# = MContinue% Then GoTo *RE_PLATE_SET
-898     *CompPlateSet
-899     '
-900     ColChk On
-901     Mov PPlateBackSet_12        '背面板置き上空
-902     M_Out(12866) = 1 Dly 0.5    'ねじロボ2動作再開(停止3～停止4)
-903     Ovrd 100
-904     '
-905 ''    ' 部品供給要求送信(処理位置変更2/27中村)
-906 '    M_Out(12787) = 1
-907     'ねじロボ製品クランプ固定待ち
-908 '    Wait M_In(11891) = 1        'ねじロボ2停止4受信
-909 MRtn = fScrewTighenRoboCheck(11891)    '停止状態を受信する
-910 'If MRtn = 0 Then Mov PInitialPosition    '"イニシャルに戻る動き"
-911 If MRtn = 0 Then GoTo *ASSY_ERROR_END
-912     '置き位置画像検査
-913 '    Mov PPlateBackCheck_3       '画像検査位置上空
-914 '    Mov PPlateBackCheck_2       '通過点
-915 '    Mvs PPlateBackCheck         '確認位置
-916     '
-917     'PInspPosition(2) = PPlateBackCheck
-918     'MInspGroup(2) = 2
-919     'MRtn = ISInspection(PInspPosition,MInspGroup,2,-1,1)
-920     'If MRtn <> 1 Then
-921     '   'エラー処理
-922     'EndIf
-923     '
-924 ''    ' 部品供給要求送信
-925 '    M_Out(12787) = 1    '処理位置変更
-926 '    Mov PPlateBackCheck_3       '画像検査位置上空
-927     '
-928     'ねじロボ引き込み待ち
-929     M_Out(12866) = 1 Dly 0.5    'ねじロボ2動作再開(停止3～完了)
-930     '
-931     'DVDメカを取る CDに伴い削除 2022/07/27 M.H
-932 *Loop_CW_CCW_S
-933     *RE_MECHA_SET_1
-934 MRtn = fScrewTighenRoboCheck(11876)    '停止状態を受信する
-935 'If MRtn = 0 Then Mov PInitialPosition   '"イニシャルに戻る動き"
-936 If MRtn = 0 Then GoTo *ASSY_ERROR_END
-937 '
-938     *CompRoboGet1
-939     '
-940 '    Ovrd 50
-941     Mov PProductOnRoboGet_3     'ねじロボ製品取り上空回避点2から3へ
-942 '    Ovrd 20
-943     Mvs PProductOnRoboGet_2     'ねじロボ製品置き上空(治具改造後従来の挙動では無理な場合)11/24追加(中村)4から2へ
-944     Ovrd 20
-945     Mvs PProductOnRoboGet_1     'ねじロボ製品取り上空
-946     Ovrd 10
-947     Mvs PProductOnRoboGet       'ねじロボ製品取り位置
-948     Dly 0.2
-949 '
-950     *RE_ROBO_GET_2
-951 '
-952     M_Out(12257) = 0            '本体チャック開OFF
-953     M_Out(12256) = 1            '本体チャック閉ON
-954 '
-955 '    Wait M_In(11266) = 1        '本体チャック閉検出
-956     MRtn = frInCheck(11266,1,MSETTIMEOUT05&)   '本体チャック閉検出
-957     If MRtn = 1 Or M_20# = MNext% Then GoTo *CompRoboGet2
-958     M_Out(12256) = 0            '本体チャック閉OFF
-959     M_Out(12257) = 1            '本体チャック開ON
-960     Dly 2.0
-961     Mvs PProductOnRoboGet_1
-962     Mvs PProductOnRoboGet_2
-963     Mov PProductOnRoboGet_3
-964     Mov PProductOnRoboGet_4
-965     Mov PInitialPosition
-966     M_Out(12257) = 0            '本体チャック開OFF
-967     M_Out(12256) = 1            '本体チャック閉ON
-968     Dly 1.0
-969     fErrorProcess(11,245,284,0)
-970     If M_20# = MNext% Then MRtn = 1
-971     If M_20# = MAbout% Then GoTo *ASSY_ERROR_END
-972     If M_20# = MNgProcess% Then GoTo *ASSY_ERROR_END
-973     M_Out(12256) = 0            '本体チャック閉OFF
-974     M_Out(12257) = 1            '本体チャック開ON
-975     Dly 2.0
-976     Mov PProductOnRoboGet_4
-977     Mov PProductOnRoboGet_3
-978     Mov PProductOnRoboGet_2
-979     Mvs PProductOnRoboGet_1
-980     Mvs PProductOnRoboGet
-981     If M_20# = MContinue% Or M_20# = MNext% Then GoTo *RE_ROBO_GET_2
-982     *CompRoboGet2
-983     M_20# = MClear%
-984     '
-985     Dly 0.2
-986     Mvs PProductOnRoboGet_1     'ねじロボ製品取り上空
-987     Ovrd 50
-988     Mvs PProductOnRoboGet_2     'ねじロボ製品取り上空回避点(9/27暫定コメントアウト)12/15コメント解除
-989     Mvs PProductOnRoboGet_3     'ねじロボ製品置き上空(治具改造後従来の挙動では無理な場合)11/24追加(中村)4から3へ
-990     Ovrd 100
-991     Mov PProductOnRoboGet_4     '経路3から4へ
-992     Cnt 1 , 10 , 10
-993 '
-994     M_Out(12868) = 1 Dly 0.3    'ねじロボ2動作完了を送信
-995     *RE_ROBO_GET_3
-996 ' CDに伴い削除 2022/07/27 M.H
-997 '    M_Out(12258) = 0            'DVDメカチャック閉OFF
-998 '    M_Out(12259) = 1            'DVDメカチャック開ON
-999 ''    Wait M_In(11268) = 1        'DVDメカチャック開検出
-1000 '    MRtn = frInCheck(11268,1,MSETTIMEOUT05&)   'DVDメカチャック開検出
-1001 '    If MRtn = 1 Then GoTo *CompRoboGet3
-1002 '    fErrorProcess(11,270,284,0)
-1003 '    If M_20# = MNext% Then M_20# = MClear%
-1004 '    If M_20# = MAbout% Then GoTo *ASSY_ERROR_END
-1005 '    If M_20# = MNgProcess% Then GoTo *ASSY_ERROR_END
-1006 '    If M_20# = MContinue% Then GoTo *RE_ROBO_GET_3
-1007     *CompRoboGet3
-1008     '
-1009     'パレットへ製品を置く
-1010     Mov PProductOnPltSet_2      '本体置き位置上空回避点
-1011     Cnt 1 , 10
-1012     Mov PProductOnPltSet_1      '本体置き位置上空
-1013     Cnt 0
-1014     Ovrd 10
-1015     Mvs PProductOnPltSet        '本体置き位置
-1016     Dly 0.5
-1017 '
-1018     *RE_PLT_SET
-1019 '
-1020     M_Out(12256) = 0            '本体チャック閉OFF
-1021     M_Out(12257) = 1            '本体チャック開ON
-1022 '
-1023     Wait M_In(11265) = 1        '本体チャック開検出
-1024 '    MRtn = frInCheck(11265,1,MSETTIMEOUT05&)   '本体チャック開検出
-1025     MRtn = frInCheck(11265,1,MSETTIMEOUT05&)   '本体チャック開検出
-1026     If MRtn = 1 Then GoTo *CompPltSet
-1027     fErrorProcess(11,244,284,0)
-1028     If M_20# = MNext% Then M_20# = MClear%
-1029     If M_20# = MAbout% Or M_20# = MNgProcess% Then
-1030         Mvs PProductOnPltSet_1
-1031         Mov PProductOnPltSet_2
-1032         Mov PInitialPosition
-1033     EndIf
-1034     If M_20# = MAbout% Then GoTo *ASSY_ERROR_END
-1035     If M_20# = MNgProcess% Then GoTo *ASSY_ERROR_END
-1036     If M_20# = MContinue% Then GoTo *RE_PLT_SET
-1037     *CompPltSet
-1038 '
-1039     Mvs PProductOnPltSet_1      '本体置き位置上空
-1040     Ovrd 100
-1041     Mov PProductOnPltSet_2      '本体置き位置上空回避点
-1042 '    Mov PInitialPosition        'イニシャルポジション
-1043     MRtn = FnCtlValue2(2)          '組立ＯＫ＋１  2022/04/28 渡辺
-1044     Mov PTicketRead_1           'チケットID読み取り回避点
-1045     MRtn = FnCtlValue2(99)         '読書開始信号OFF  2022/04/28 渡辺
-1046     '
-1047     'チケットID書き込み
-1048     M_20# = MAssyOK%
-1049     *ASSY_ERROR_END
-1050     *AssyEnd
-1051     *fnAssyStart_FEndPosi
-1052 FEnd
-1053 '
-1054 '■fnPiasCheck
-1055 ''' <summary>
-1056 ''' PIASチケット読込み
-1057 ''' </summary>
-1058 ''' <returns>   0 : NG
-1059 '''             1 : OK(読込み完了)
-1060 ''' </returns>
-1061 ''' <remarks>
-1062 ''' Date   : 2021/07/07 : M.Hayakawa
-1063 ''' </remarks>'
-1064 Function M% fnPiasCheck
-1065     fnPiasCheck = 0
-1066     M_Out16(12576) = 79             'AUTO画面 PIASチケット読込み
-1067     Wait M_In(MIN_IS_Ready%) = 1            'カメラ接続成功(M5370)
-1068 '
-1069 *RETRY_PIAS
-1070     M_20# = MClear%
-1071     M_Out16(12576) = 80             'AUTO画面 PIASチケット読込み
-1072     '
-1073     '【IDチケット読み込み】
-1074     PInspPosition(1) = PTicketRead  'IDチケット読取位置
-1075     MInspGroup%(1) = 1              '検査G番号
-1076     MRtn = ISInspectionSingle(PInspPosition, MInspGroup%, 1, -1, 1 )  '画像処理検査実行
+871     Mov PPlateBackSet_12        '爪入れ前回避点
+872     Cnt 0
+873     Ovrd 25
+874     Accel 25 , 25
+875     Mvs PPlateBackSet_11        '爪入れ込み前
+876     Mvs PPlateBackSet_10        '爪入れ込み1
+877     Mvs PPlateBackSet_9         '爪入れ込み2
+878 '    CmpG 1.0,1.0,1.0,1.0,1.0,1.0,,
+879 '    Cmp Pos, &B001000
+880     Cnt 1           'コメントアウト
+881     Mov PPlateBackSet_8         '経路1
+882     Mov PPlateBackSet_7         '経路2
+883     Mov PPlateBackSet_6         '経路3
+884     Mov PPlateBackSet_5         '経路4
+885     Mov PPlateBackSet_4         '経路5
+886     Mov PPlateBackSet_3         '経路6
+887     Mov PPlateBackSet_2         '経路7
+888     Mov PPlateBackSet_1         '経路8
+889     Mov PPlateBackSet           '背面板離し位置
+890 '    Cmp Off
+891     Accel 100 , 100
+892     Cnt 0
+893     Dly 0.1
+894 *RE_PLATE_SET
+895     M_Out(12256) = 0            '本体チャック閉OFF
+896     M_Out(12257) = 1            '本体チャック開ON
+897     '
+898 '    Wait M_In(11265)            '本体チャック開検出
+899     MRtn = frInCheck(11265,1,MSETTIMEOUT05&)   '本体チャック開検出
+900     If MRtn = 1 Then GoTo *CompPlateSet
+901     fErrorProcess(11,244,284,0)
+902     If M_20# = MNext% Then M_20# = MClear%
+903     If M_20# = MAbout% Then GoTo *ASSY_ERROR_END
+904     If M_20# = MNgProcess% Then GoTo *ASSY_ERROR_END
+905     If M_20# = MContinue% Then GoTo *RE_PLATE_SET
+906     *CompPlateSet
+907 '-----暫定押し-------------------------------------(22/12/14中村)ここから
+908 *RE_BUCK_PUSH
+909     M_20# = MClear%
+910     Mov PPlateBackPush_2
+911 '
+912     M_Out(12257) = 0            '本体チャック開OFF
+913     M_Out(12256) = 1            '本体チャック閉ON
+914 '
+915     MRtn = frInCheck(11266,1,MSETTIMEOUT05&)   '本体チャック閉検出
+916 '
+917     If MRtn = 1 Then GoTo *CompBuckPushSetting  '正常なら押し動作へ
+918 '
+919     fErrorProcess(11,245,287,0) '閉端センサーNG時エラー表示
+920         If M_20# = MNext% Then M_20# = MClear%              '次へが押されたら値を初期化
+921         If M_20# = MAbout% Then GoTo *ASSY_ERROR_END       '停止が押されたらエラーエンドへ
+922         If M_20# = MNgProcess% Then GoTo *ASSY_ERROR_END    'NGが押されたらエラーエンドへ
+923         If M_20# = MContinue% Then GoTo *RE_BUCK_PUSH       'リトライが押されたらもう一度閉じる
+924 '
+925 *CompBuckPushSetting
+926 '
+927     Mvs PPlateBackPush_1
+928     Ovrd 10
+929     Mvs PPlateBackPush
+930 '    Dly 0.1     'クランプをするので削除(221219中村)
+931 '背面クランプここから(12/15)
+932     M_Out(12866) = 1 Dly 0.5    'ねじロボ2動作再開(停止3～停止4)
+933     MRtn = fScrewTighenRoboCheck(11891)    '停止状態を受信する
+934         If MRtn = 0 Then
+935             Mvs PPlateBackPush_1
+936             Mov PPlateBackSet_13
+937             Mov PInitialPosition    '"イニシャルに戻る動き"
+938         EndIf
+939         If MRtn = 0 Then GoTo *ASSY_ERROR_END
+940 '背面クランプここまで(12/15)
+941     Ovrd 50                     '20→50に変更(221219中村)
+942     Mvs PPlateBackPush_1
+943 *RE_CHUCK_OPEN
+944     M_20# = MClear%
+945     M_Out(12256) = 0            '本体チャック閉OFF
+946     M_Out(12257) = 1            '本体チャック開ON
+947     MRtn = frInCheck(11265,1,MSETTIMEOUT05&)   '本体チャック開検出
+948     If MRtn = 1 Then GoTo *CompChuckOpenForBackPush
+949     fErrorProcess(11,244,284,0)
+950         If M_20# = MNext% Then M_20# = MClear%              '次へが押されたら値を初期化
+951         If M_20# = MAbout% Then GoTo *ASSY_ERROR_END       '停止が押されたらエラーエンドへ
+952         If M_20# = MNgProcess% Then GoTo *RE_CHUCK_OPEN    'NGが押されたらエラーエンドへ
+953         If M_20# = MContinue% Then GoTo *RE_CHUCK_OPEN       'リトライが押されたらもう一度閉じる
+954 *CompChuckOpenForBackPush
+955 '-----暫定押し-------------------------------------(22/12/14中村)ここまで
+956 '
+957     ColChk On
+958     Mov PPlateBackSet_13        '背面板置き上空
+959     M_Out(12866) = 1 Dly 0.5    'ねじロボ2動作再開(停止3～停止4)
+960     Ovrd 100
+961 '
+962     '
+963 ''    ' 部品供給要求送信(処理位置変更2/27中村)
+964 '    M_Out(12787) = 1
+965     'ねじロボ製品クランプ固定待ち
+966 '    Wait M_In(11891) = 1        'ねじロボ2停止4受信
+967 MRtn = fScrewTighenRoboCheck(11891)    '停止状態を受信する
+968 'If MRtn = 0 Then Mov PInitialPosition    '"イニシャルに戻る動き"
+969 If MRtn = 0 Then GoTo *ASSY_ERROR_END
+970     '置き位置画像検査
+971 '    Mov PPlateBackCheck_3       '画像検査位置上空
+972 '    Mov PPlateBackCheck_2       '通過点
+973 '    Mvs PPlateBackCheck         '確認位置
+974     '
+975     'PInspPosition(2) = PPlateBackCheck
+976     'MInspGroup(2) = 2
+977     'MRtn = ISInspection(PInspPosition,MInspGroup,2,-1,1)
+978     'If MRtn <> 1 Then
+979     '   'エラー処理
+980     'EndIf
+981     '
+982 ''    ' 部品供給要求送信
+983 '    M_Out(12787) = 1    '処理位置変更
+984 '    Mov PPlateBackCheck_3       '画像検査位置上空
+985     '
+986     'ねじロボ引き込み待ち
+987     M_Out(12866) = 1 Dly 0.5    'ねじロボ2動作再開(停止3～完了)
+988     '
+989     'DVDメカを取る CDに伴い削除 2022/07/27 M.H
+990 *Loop_CW_CCW_S
+991     *RE_MECHA_SET_1
+992 MRtn = fScrewTighenRoboCheck(11876)    '停止状態を受信する
+993 'If MRtn = 0 Then Mov PInitialPosition   '"イニシャルに戻る動き"
+994 If MRtn = 0 Then GoTo *ASSY_ERROR_END
+995 '
+996     *CompRoboGet1
+997     '
+998 '    Ovrd 50
+999     Mov PProductOnRoboGet_3     'ねじロボ製品取り上空回避点2から3へ
+1000 '    Ovrd 20
+1001     Mvs PProductOnRoboGet_2     'ねじロボ製品置き上空(治具改造後従来の挙動では無理な場合)11/24追加(中村)4から2へ
+1002     Ovrd 20
+1003     Mvs PProductOnRoboGet_1     'ねじロボ製品取り上空
+1004     Ovrd 10
+1005     Mvs PProductOnRoboGet       'ねじロボ製品取り位置
+1006     Dly 0.2
+1007 '
+1008     *RE_ROBO_GET_2
+1009 '
+1010     M_Out(12257) = 0            '本体チャック開OFF
+1011     M_Out(12256) = 1            '本体チャック閉ON
+1012 '
+1013 '    Wait M_In(11266) = 1        '本体チャック閉検出
+1014     MRtn = frInCheck(11266,1,MSETTIMEOUT05&)   '本体チャック閉検出
+1015     If MRtn = 1 Or M_20# = MNext% Then GoTo *CompRoboGet2
+1016     M_Out(12256) = 0            '本体チャック閉OFF
+1017     M_Out(12257) = 1            '本体チャック開ON
+1018     Dly 2.0
+1019     Mvs PProductOnRoboGet_1
+1020     Mvs PProductOnRoboGet_2
+1021     Mov PProductOnRoboGet_3
+1022     Mov PProductOnRoboGet_4
+1023     Mov PInitialPosition
+1024     M_Out(12257) = 0            '本体チャック開OFF
+1025     M_Out(12256) = 1            '本体チャック閉ON
+1026     Dly 1.0
+1027     fErrorProcess(11,245,284,0)
+1028     If M_20# = MNext% Then MRtn = 1
+1029     If M_20# = MAbout% Then GoTo *ASSY_ERROR_END
+1030     If M_20# = MNgProcess% Then GoTo *ASSY_ERROR_END
+1031     M_Out(12256) = 0            '本体チャック閉OFF
+1032     M_Out(12257) = 1            '本体チャック開ON
+1033     Dly 2.0
+1034     Mov PProductOnRoboGet_4
+1035     Mov PProductOnRoboGet_3
+1036     Mov PProductOnRoboGet_2
+1037     Mvs PProductOnRoboGet_1
+1038     Mvs PProductOnRoboGet
+1039     If M_20# = MContinue% Or M_20# = MNext% Then GoTo *RE_ROBO_GET_2
+1040     *CompRoboGet2
+1041     M_20# = MClear%
+1042     '
+1043     Dly 0.2
+1044     Mvs PProductOnRoboGet_1     'ねじロボ製品取り上空
+1045     Ovrd 50
+1046     Mvs PProductOnRoboGet_2     'ねじロボ製品取り上空回避点(9/27暫定コメントアウト)12/15コメント解除
+1047     Mvs PProductOnRoboGet_3     'ねじロボ製品置き上空(治具改造後従来の挙動では無理な場合)11/24追加(中村)4から3へ
+1048     Ovrd 100
+1049     Mov PProductOnRoboGet_4     '経路3から4へ
+1050     Cnt 1 , 10 , 10
+1051 '
+1052     M_Out(12868) = 1 Dly 0.3    'ねじロボ2動作完了を送信
+1053     *RE_ROBO_GET_3
+1054 ' CDに伴い削除 2022/07/27 M.H
+1055 '    M_Out(12258) = 0            'DVDメカチャック閉OFF
+1056 '    M_Out(12259) = 1            'DVDメカチャック開ON
+1057 ''    Wait M_In(11268) = 1        'DVDメカチャック開検出
+1058 '    MRtn = frInCheck(11268,1,MSETTIMEOUT05&)   'DVDメカチャック開検出
+1059 '    If MRtn = 1 Then GoTo *CompRoboGet3
+1060 '    fErrorProcess(11,270,284,0)
+1061 '    If M_20# = MNext% Then M_20# = MClear%
+1062 '    If M_20# = MAbout% Then GoTo *ASSY_ERROR_END
+1063 '    If M_20# = MNgProcess% Then GoTo *ASSY_ERROR_END
+1064 '    If M_20# = MContinue% Then GoTo *RE_ROBO_GET_3
+1065     *CompRoboGet3
+1066     '
+1067     'パレットへ製品を置く
+1068     Mov PProductOnPltSet_2      '本体置き位置上空回避点
+1069     Cnt 1 , 10
+1070     Mov PProductOnPltSet_1      '本体置き位置上空
+1071     Cnt 0
+1072     Ovrd 10
+1073     Mvs PProductOnPltSet        '本体置き位置
+1074     Dly 0.5
+1075 '
+1076     *RE_PLT_SET
 1077 '
-1078     'エラーの場合
-1079     If MRtn <> 1 Then
-1080         MRtn = ISInspectionSingle(PInspPosition, MInspGroup%, 1, -1, 1 )  'もう一度画像処理検査実行
-1081         If MRtn <> 1 Then
-1082             'D720 -> D1300 コピー要求
-1083             M_Out(12565) = 1
-1084             Dly 0.5
-1085             M_Out(12565) = 0
-1086             'エラー処理記述
-1087             fnWindScreenOpen(MWindErrScr3, 17, 20, 0)
-1088             'GOT KEY入力待ち
-1089             MKeyNumber = fnKEY_WAIT()
-1090             '
-1091             Select MKeyNumber
-1092                 Case MNext%         '次へを選択した場合
-1093                     M_20# = MPass%                          'M_20# プログラム間共通外部変数
-1094                     fnWindScreenOpen(MWindReSet, 0, 0, 0)   'エラー画面消去
-1095                     GoTo *fnPiasCheck_End                   'PIASチェック終了
-1096                     Break
-1097                 Case MAbout%        '停止を選択した場合
-1098                     M_20# = MAbout%                         'M_20# プログラム間共通外部変数
-1099                     fnWindScreenOpen(MWindReSet, 0, 0, 0)   'エラー画面消去
-1100                     GoTo *fnPiasCheck_End                   'PIASチェック終了
-1101                     Break
-1102                 Case MNgProcess%    'NGを選択した場合
-1103                     M_20# = MAbout%                         'M_20# プログラム間共通外部変数
-1104                     fnWindScreenOpen(MWindReSet, 0, 0, 0)   'エラー画面消去
-1105                     GoTo *fnPiasCheck_End                   'PIASチェック終了
-1106                     Break
-1107                 Case MContinue%     '継続を選択した場合
-1108                     fnWindScreenOpen(MWindReSet, 0, 0, 0)   'エラー画面消去
-1109                     M_20# = MContinue%
-1110                     GoTo *RETRY_PIAS                        'PIASチェックリトライ
-1111                     Break
-1112             End Select
-1113         EndIf
-1114     EndIf
-1115 '----------D720 -> D1300 コピー要求----------
-1116     M_Out(12565) = 1
-1117     Dly 0.5
-1118     M_Out(12565) = 0
-1119 '----------通信確認をする----------
-1120     fnAutoScreenComment(81) ' AUTO画面 PC通信確認
-1121     MRtn = 0                ' 初期化
-1122     M_20# = MClear%         ' 初期化
-1123     MRtn = fnPCComuCheck()  ' PC-PLC通信チェック（M_20# = MClear%/MAbout%/MNext%/MContinue%/MNgProcess%)
-1124     ' 通信確認NG時に外部変数の状態によりラベルジャンプ処理する（OK時はなにもしない）
-1125     If MRtn <> 1 Then
-1126         If M_20# = MContinue% Then
-1127             GoTo *RETRY_PIAS         ' チケット読み直しからリトライ
-1128         Else
-1129             GoTo *fnPiasCheck_End    ' その他はPIASチェック終了
-1130         EndIf
-1131     EndIf
-1132 '----------工程抜け確認----------
-1133     fnAutoScreenComment(82) ' AUTO画面 工程抜け確認
-1134     MRtn = 0                ' 初期化
-1135     M_20# = MClear%         ' 初期化
-1136     MRtn = fnProcessCheck() ' 工程フラグチェック（M_20# = MClear%/MAbout%/MContinue%/MNgProcess%M/Pass%)
-1137     ' 工程抜けNG時に外部変数の状態によりラベルジャンプ処理する（OK時はなにもしない）
-1138     If MRtn <> 1 Then
-1139         If M_20# = MContinue% Then
-1140             GoTo *RETRY_PIAS         ' リトライはチケット読み直しから
-1141         Else
-1142             GoTo *fnPiasCheck_End    ' その他はPIASチェック終了
-1143         EndIf
-1144     EndIf
-1145     '
-1146     fnPiasCheck = 1
-1147     *fnPiasCheck_End
-1148 FEnd
-1149 '
-1150 '■fnPCComuCheck
-1151 ''' <summary>
-1152 ''' PC-PLC通信チェック
-1153 ''' </summary>
-1154 ''' <returns>   0 : NG
-1155 '''             1 : OK(読込み完了)
-1156 ''' </returns>
-1157 ''' <remarks>
-1158 ''' Date   : 2021/07/07 : M.Hayakawa
-1159 ''' </remarks>'
-1160 Function M% fnPCComuCheck
-1161     fnPCComuCheck = 0
-1162     MJudge% = 0                                  '初期化
-1163     M_Out(MOUT_PIAS_ComCheck%) = 1               '12544 M6544 toPLC_PC通信確認要求(M300)
-1164     Wait M_In(11575) = 1                         'M5575  toRBT_通信確認統合返信
-1165     '
-1166     For MStaNo = 0 To 5
-1167         '
-1168         If M_In(MIN_PIAS_ComOK%) = 1 Then
-1169             'PC通信OK(M400)
-1170             MJudge% = MOK%
-1171             MStaNo = 5
-1172             Break
-1173         ElseIf M_In(MIN_PIAS_ComTimeOut%) = 1 Then
-1174             'toRBT_通信確認time out
-1175             MJudge% = MNG%
-1176             MCommentD1001 = 15
-1177             MCommentD1002 = 21
-1178             MStaNo = 5
-1179             Break
-1180         Else
-1181             'toRBT_通信確認time out
-1182             MJudge% = MNG%
-1183             MCommentD1001 = 14
-1184             MCommentD1002 = 21
-1185             Break
-1186         EndIf
-1187     Next MStaNo
-1188     '
-1189     '上記で返信フラグを受信してからPC通信確認OFF
-1190     M_Out(MOUT_PIAS_ComCheck%) = 0               'PLC内でM300を保持しているのでRBTでは解除
-1191     '
-1192     'エラー画面
-1193     If MJudge% <> MOK% Then
-1194         M_20# = MClear%     '初期化
-1195         'エラー処理記述
-1196         fnWindScreenOpen(MWindErrScr3, MCommentD1001, MCommentD1002, 0)
-1197         'GOT KEY入力待ち
-1198         MKeyNumber = fnKEY_WAIT()
-1199         '
-1200         If MKeyNumber = MAbout% Then            '停止を選択した場合
-1201             M_20# = MAbout%                     'M_20# プログラム間共通外部変数
-1202             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1203             Break
-1204         ElseIf MKeyNumber = MNext% Then         '次へを選択した場合
-1205             M_20# = MNext%                      'M_20# プログラム間共通外部変数
-1206             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1207             Break
-1208         ElseIf MKeyNumber = MContinue% Then     '停止を選択した場合
-1209             M_20# = MContinue%                  'M_20# プログラム間共通外部変数
-1210             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1211             Break
-1212         ElseIf MKeyNumber = MNgProcess% Then    '次へを選択した場合
-1213             M_20# = MNgProcess%                 'M_20# プログラム間共通外部変数
-1214             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1215             Break
-1216         EndIf
-1217     Else
-1218         'OKの場合
-1219         fnPCComuCheck = 1
-1220     EndIf
-1221 FEnd
-1222 '
-1223 '■fnProcessCheck
-1224 ''' <summary>
-1225 ''' 工程抜け確認
-1226 ''' </summary>
-1227 ''' <returns>    1：工程履歴OK     0：異常終了
-1228 '''             -1：前工程履歴NG  -2：自工程履歴あり
-1229 '''             -3：モデル仕向NG  -4：タイムアウト
-1230 '''             -5：履歴処理エラー
-1231 ''' </returns>
-1232 ''' <remarks>
-1233 ''' Date   : 2021/07/07 : M.Hayakawa
-1234 ''' </remarks>'
-1235 Function M% fnProcessCheck
-1236     fnProcessCheck = 0
-1237     MJudge% = MNG%      '一旦NGを初期化とする
-1238 '----------工程抜け確認----------
-1239     MCommentD1001 = 0   'コメント初期化
-1240     For MStaNo = 0 To 5
-1241         M_Out(MOUT_PIAS_Missing_Process%) = 1           'toPLC_PC工程抜け確認要求(M302)
-1242         Wait M_In(11577) = 1                            'M5577  toRBT_PC工程抜け確認統合返信
-1243         '
-1244         If M_In(MIN_PIAS_ProcessHistryOK%) = 1 Then             '11556 履歴OK M407
-1245             MJudge% = MOK%
-1246             fnAutoScreenComment(85)     ' AUTO画面
-1247             MStaNo = 5
-1248             Break
-1249         ElseIf M_In(MIN_PIAS_MyProcessComp%) = 1 Then           '11573 自工程履歴あり M426
-1250             MFlgLoop% = 0
-1251             MJudge% = MNG%
-1252             MCommentD1001 = 27
-1253             MCommentD1002 = 22
-1254             fnAutoScreenComment(94)     ' AUTO画面
-1255             fnProcessCheck = -2         ' NGは-2を返す
-1256             MStaNo = 5
-1257             Break
-1258         ElseIf M_In(MIN_PIAS_ModelTypeNG%) = 1 Then             '11554 モデル仕向NG M406
-1259            MJudge% = MNG%
-1260             MCommentD1001 = 31
-1261             MCommentD1002 = 22
-1262             fnAutoScreenComment(83)     ' AUTO画面
-1263             fnProcessCheck = -3         ' NGは-3を返す
-1264             MStaNo = 5
+1078     M_Out(12256) = 0            '本体チャック閉OFF
+1079     M_Out(12257) = 1            '本体チャック開ON
+1080 '
+1081     Wait M_In(11265) = 1        '本体チャック開検出
+1082 '    MRtn = frInCheck(11265,1,MSETTIMEOUT05&)   '本体チャック開検出
+1083     MRtn = frInCheck(11265,1,MSETTIMEOUT05&)   '本体チャック開検出
+1084     If MRtn = 1 Then GoTo *CompPltSet
+1085     fErrorProcess(11,244,284,0)
+1086     If M_20# = MNext% Then M_20# = MClear%
+1087     If M_20# = MAbout% Or M_20# = MNgProcess% Then
+1088         Mvs PProductOnPltSet_1
+1089         Mov PProductOnPltSet_2
+1090         Mov PInitialPosition
+1091     EndIf
+1092     If M_20# = MAbout% Then GoTo *ASSY_ERROR_END
+1093     If M_20# = MNgProcess% Then GoTo *ASSY_ERROR_END
+1094     If M_20# = MContinue% Then GoTo *RE_PLT_SET
+1095     *CompPltSet
+1096 '
+1097     Mvs PProductOnPltSet_1      '本体置き位置上空
+1098     Ovrd 100
+1099     Mov PProductOnPltSet_2      '本体置き位置上空回避点
+1100 '    Mov PInitialPosition        'イニシャルポジション
+1101     MRtn = FnCtlValue2(2)          '組立ＯＫ＋１  2022/04/28 渡辺
+1102     Mov PTicketRead_1           'チケットID読み取り回避点
+1103     MRtn = FnCtlValue2(99)         '読書開始信号OFF  2022/04/28 渡辺
+1104     '
+1105     'チケットID書き込み
+1106     M_20# = MAssyOK%
+1107     *ASSY_ERROR_END
+1108     *AssyEnd
+1109     *fnAssyStart_FEndPosi
+1110 FEnd
+1111 '
+1112 '■fnPiasCheck
+1113 ''' <summary>
+1114 ''' PIASチケット読込み
+1115 ''' </summary>
+1116 ''' <returns>   0 : NG
+1117 '''             1 : OK(読込み完了)
+1118 ''' </returns>
+1119 ''' <remarks>
+1120 ''' Date   : 2021/07/07 : M.Hayakawa
+1121 ''' </remarks>'
+1122 Function M% fnPiasCheck
+1123     fnPiasCheck = 0
+1124     M_Out16(12576) = 79             'AUTO画面 PIASチケット読込み
+1125     Wait M_In(MIN_IS_Ready%) = 1            'カメラ接続成功(M5370)
+1126 '
+1127 *RETRY_PIAS
+1128     M_20# = MClear%
+1129     M_Out16(12576) = 80             'AUTO画面 PIASチケット読込み
+1130     '
+1131     '【IDチケット読み込み】
+1132     PInspPosition(1) = PTicketRead  'IDチケット読取位置
+1133     MInspGroup%(1) = 1              '検査G番号
+1134     MRtn = ISInspectionSingle(PInspPosition, MInspGroup%, 1, -1, 1 )  '画像処理検査実行
+1135 '
+1136     'エラーの場合
+1137     If MRtn <> 1 Then
+1138         MRtn = ISInspectionSingle(PInspPosition, MInspGroup%, 1, -1, 1 )  'もう一度画像処理検査実行
+1139         If MRtn <> 1 Then
+1140             'D720 -> D1300 コピー要求
+1141             M_Out(12565) = 1
+1142             Dly 0.5
+1143             M_Out(12565) = 0
+1144             'エラー処理記述
+1145             fnWindScreenOpen(MWindErrScr3, 17, 20, 0)
+1146             'GOT KEY入力待ち
+1147             MKeyNumber = fnKEY_WAIT()
+1148             '
+1149             Select MKeyNumber
+1150                 Case MNext%         '次へを選択した場合
+1151                     M_20# = MPass%                          'M_20# プログラム間共通外部変数
+1152                     fnWindScreenOpen(MWindReSet, 0, 0, 0)   'エラー画面消去
+1153                     GoTo *fnPiasCheck_End                   'PIASチェック終了
+1154                     Break
+1155                 Case MAbout%        '停止を選択した場合
+1156                     M_20# = MAbout%                         'M_20# プログラム間共通外部変数
+1157                     fnWindScreenOpen(MWindReSet, 0, 0, 0)   'エラー画面消去
+1158                     GoTo *fnPiasCheck_End                   'PIASチェック終了
+1159                     Break
+1160                 Case MNgProcess%    'NGを選択した場合
+1161                     M_20# = MAbout%                         'M_20# プログラム間共通外部変数
+1162                     fnWindScreenOpen(MWindReSet, 0, 0, 0)   'エラー画面消去
+1163                     GoTo *fnPiasCheck_End                   'PIASチェック終了
+1164                     Break
+1165                 Case MContinue%     '継続を選択した場合
+1166                     fnWindScreenOpen(MWindReSet, 0, 0, 0)   'エラー画面消去
+1167                     M_20# = MContinue%
+1168                     GoTo *RETRY_PIAS                        'PIASチェックリトライ
+1169                     Break
+1170             End Select
+1171         EndIf
+1172     EndIf
+1173 '----------D720 -> D1300 コピー要求----------
+1174     M_Out(12565) = 1
+1175     Dly 0.5
+1176     M_Out(12565) = 0
+1177 '----------通信確認をする----------
+1178     fnAutoScreenComment(81) ' AUTO画面 PC通信確認
+1179     MRtn = 0                ' 初期化
+1180     M_20# = MClear%         ' 初期化
+1181     MRtn = fnPCComuCheck()  ' PC-PLC通信チェック（M_20# = MClear%/MAbout%/MNext%/MContinue%/MNgProcess%)
+1182     ' 通信確認NG時に外部変数の状態によりラベルジャンプ処理する（OK時はなにもしない）
+1183     If MRtn <> 1 Then
+1184         If M_20# = MContinue% Then
+1185             GoTo *RETRY_PIAS         ' チケット読み直しからリトライ
+1186         Else
+1187             GoTo *fnPiasCheck_End    ' その他はPIASチェック終了
+1188         EndIf
+1189     EndIf
+1190 '----------工程抜け確認----------
+1191     fnAutoScreenComment(82) ' AUTO画面 工程抜け確認
+1192     MRtn = 0                ' 初期化
+1193     M_20# = MClear%         ' 初期化
+1194     MRtn = fnProcessCheck() ' 工程フラグチェック（M_20# = MClear%/MAbout%/MContinue%/MNgProcess%M/Pass%)
+1195     ' 工程抜けNG時に外部変数の状態によりラベルジャンプ処理する（OK時はなにもしない）
+1196     If MRtn <> 1 Then
+1197         If M_20# = MContinue% Then
+1198             GoTo *RETRY_PIAS         ' リトライはチケット読み直しから
+1199         Else
+1200             GoTo *fnPiasCheck_End    ' その他はPIASチェック終了
+1201         EndIf
+1202     EndIf
+1203     '
+1204     fnPiasCheck = 1
+1205     *fnPiasCheck_End
+1206 FEnd
+1207 '
+1208 '■fnPCComuCheck
+1209 ''' <summary>
+1210 ''' PC-PLC通信チェック
+1211 ''' </summary>
+1212 ''' <returns>   0 : NG
+1213 '''             1 : OK(読込み完了)
+1214 ''' </returns>
+1215 ''' <remarks>
+1216 ''' Date   : 2021/07/07 : M.Hayakawa
+1217 ''' </remarks>'
+1218 Function M% fnPCComuCheck
+1219     fnPCComuCheck = 0
+1220     MJudge% = 0                                  '初期化
+1221     M_Out(MOUT_PIAS_ComCheck%) = 1               '12544 M6544 toPLC_PC通信確認要求(M300)
+1222     Wait M_In(11575) = 1                         'M5575  toRBT_通信確認統合返信
+1223     '
+1224     For MStaNo = 0 To 5
+1225         '
+1226         If M_In(MIN_PIAS_ComOK%) = 1 Then
+1227             'PC通信OK(M400)
+1228             MJudge% = MOK%
+1229             MStaNo = 5
+1230             Break
+1231         ElseIf M_In(MIN_PIAS_ComTimeOut%) = 1 Then
+1232             'toRBT_通信確認time out
+1233             MJudge% = MNG%
+1234             MCommentD1001 = 15
+1235             MCommentD1002 = 21
+1236             MStaNo = 5
+1237             Break
+1238         Else
+1239             'toRBT_通信確認time out
+1240             MJudge% = MNG%
+1241             MCommentD1001 = 14
+1242             MCommentD1002 = 21
+1243             Break
+1244         EndIf
+1245     Next MStaNo
+1246     '
+1247     '上記で返信フラグを受信してからPC通信確認OFF
+1248     M_Out(MOUT_PIAS_ComCheck%) = 0               'PLC内でM300を保持しているのでRBTでは解除
+1249     '
+1250     'エラー画面
+1251     If MJudge% <> MOK% Then
+1252         M_20# = MClear%     '初期化
+1253         'エラー処理記述
+1254         fnWindScreenOpen(MWindErrScr3, MCommentD1001, MCommentD1002, 0)
+1255         'GOT KEY入力待ち
+1256         MKeyNumber = fnKEY_WAIT()
+1257         '
+1258         If MKeyNumber = MAbout% Then            '停止を選択した場合
+1259             M_20# = MAbout%                     'M_20# プログラム間共通外部変数
+1260             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1261             Break
+1262         ElseIf MKeyNumber = MNext% Then         '次へを選択した場合
+1263             M_20# = MNext%                      'M_20# プログラム間共通外部変数
+1264             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
 1265             Break
-1266         ElseIf M_In(MIN_PIAS_ProcessHistryNG%) = 1 Then         '11555 前工程履歴NG M408
-1267             '履歴NGは直ぐに終了せず繰り返し確認を行う
-1268             '前工程の書込みが終了していない可能性があるため
-1269             MJudge% = MNG%
-1270             MCommentD1001 = 32
-1271             MCommentD1002 = 22
-1272             fnAutoScreenComment(84)     ' AUTO画面
-1273             fnProcessCheck = -1         ' NGは-1を返す
-1274             Dly 1.0
-1275             '工程抜け確認OFF
-1276             M_Out(MOUT_PIAS_Missing_Process%) = 0               'toPLC_PC工程抜け確認要求(M302)
-1277             Dly 1.0
-1278            'MStaNo = 5
-1279             Break
-1280         ElseIf M_In(MIN_PIAS_ProcessHistryErr%) = 1 Then        '11557 履歴処理エラー M432
-1281             MFlgLoop% = 0
-1282             MJudge% = MNG%
-1283             MCommentD1001 = 29
-1284             MCommentD1002 = 22
-1285             fnAutoScreenComment(86)     ' AUTO画面 履歴処理エラー
-1286             fnProcessCheck = -5         ' NGは-5を返す
-1287             MStaNo = 5
-1288             Break
-1289         ElseIf M_In(MIN_PIAS_ProcessHistryTimeOut%) = 1 Then    'タイムアウト
-1290             MJudge% = MNG%
-1291             If MCommentD1001 = 32 Then
-1292                 '何もしない
-1293             Else
-1294                 MCommentD1001 = 26
-1295             EndIf
-1296             MCommentD1002 = 22
-1297             fnProcessCheck = -4         ' NGは-4を返す
-1298             MStaNo = 5
-1299             Break
-1300         Else
-1301             MJudge% = MNG%
-1302             MCommentD1001 = 28
-1303             MCommentD1002 = 22
-1304         EndIf
-1305     Next MStaNo
-1306     '工程抜け確認OFF
-1307     M_Out(MOUT_PIAS_Missing_Process%) = 0      'toPLC_PC工程抜け確認要求(M302)
-1308     '通過履歴NG 工程抜けの場合
-1309     If MJudge% = MPass% Then
-1310         M_20# = MPass%
-1311     EndIf
-1312     '
-1313     'エラー画面
-1314     If MJudge% <> MOK% Then
-1315         M_20# = MClear%     '初期化
-1316         'エラー処理記述
-1317         fnWindScreenOpen(MWindErrScr3, MCommentD1001, MCommentD1002, 0)
-1318         'GOT KEY入力待ち
-1319         MKeyNumber = fnKEY_WAIT()
-1320         '
-1321         Select MKeyNumber
-1322             Case MAbout%        '停止を選択した場合
-1323                 M_20# = MAbout%         'M_20# プログラム間共通外部変数
-1324                 fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1325                 Break
-1326             Case MNext%         '次へを選択した場合
-1327                 M_20# = MPass%          'M_20# プログラム間共通外部変数
-1328                 fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1329                 Break
-1330             Case MContinue%     '継続を選択した場合
-1331                 M_20# = MContinue%      'M_20# プログラム間共通外部変数
-1332                 fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1333                 Break
-1334             Case MNgProcess%    'NGを選択した場合
-1335                 M_20# = MNgProcess%     'M_20# プログラム間共通外部変数
-1336                 fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1337                 Break
-1338         End Select
-1339     Else
-1340         fnProcessCheck = 1  ' OKは1を返す
-1341     EndIf
-1342 FEnd
-1343 '
-1344 '■fnPiasWrite
-1345 ''' <summary>
-1346 ''' Pias 組立結果書込み要求
-1347 ''' </summary>
-1348 '''<param name="MFlg%">
-1349 '''                 MOK%(1) = 工程履歴にOKを書込む
-1350 '''                 MNG%(0) = 工程履歴にNGを書込む
-1351 '''</param>
-1352 '''<returns></returns>
-1353 ''' <remarks>
-1354 ''' Date   : 2021/07/07 : M.Hayakawa
-1355 ''' </remarks>'
-1356 Function M% fnPiasWrite(ByVal MFlg%)
-1357       fnPiasWrite = 0
-1358 *RETRY_PIASWRITE
-1359     '
-1360     '組立OK(MOK%)の場合　M306 ON
-1361    '組立NG(MNG%)の場合　M307 ON
-1362     If MFlg% = MOK% Then
-1363         M_Out(MOUT_PiasAssyResultOK%) = 1     'M6549 -> M306
-1364     Else
-1365         M_Out(MOUT_PiasAssyResultNG%) = 1     'M6550 -> M307
-1366     EndIf
-1367     Dly 0.1                  '念のため
-1368     '
-1369     'Piasへ書込み開始 M305 -> ON
-1370     M_Out(MOUT_PiasAssyResultWr%) = 1         'M6548 -> M305
-1371     Wait M_In(11582) = 1                        '組立完了統合返信 M5582
-1372     '
-1373     MJudge% = MNG%
-1374     '
-1375     For MStaNo = 0 To 5
-1376         If M_In(MIN_PiasProcessOK%) = 1 Then          'M414 工程履歴処理OK
-1377             MJudge% = MOK%
-1378             'MRet = fnAutoScreenComment(85)  'AUTO画面
-1379             MStaNo = 5
-1380             Break
-1381         '
-1382         ElseIf M_In(MIN_PiasProcessNG%) = 1 Then          'M415 工程履歴処理NG
-1383             MJudge% = MNG%
-1384             'MRet = fnAutoScreenComment(85)  'AUTO画面
-1385            MCommentD1001 = 34
-1386            MCommentD1002 = 25
-1387             MStaNo = 5
-1388             Break
-1389         '
-1390         ElseIf M_In(MIN_PiasProcessOtherErr%) = 1 Then         'M435 工程履歴処理エラー(なんかのトラブル)
-1391             MJudge% = MNG%
-1392             'MRet = fnAutoScreenComment(85)  'AUTO画面
-1393            MCommentD1001 = 35
-1394            MCommentD1002 = 25
-1395             MStaNo = 5
-1396             Break
-1397         '
-1398         ElseIf M_In(11583) = 1 Then                         '工程履歴処理time out
-1399             MJudge% = MNG%
-1400             'MRet = fnAutoScreenComment(85)  'AUTO画面
-1401            MCommentD1001 = 36
-1402            MCommentD1002 = 25
-1403             MStaNo = 5
-1404             Break
-1405         '
-1406         Else
-1407             MJudge% = MNG%
-1408            MCommentD1001 = 42
-1409            MCommentD1002 = 25
-1410         '
-1411         EndIf
-1412         '
-1413     Next MStaNo
-1414     '
-1415     'Piasへ書込み開始 M305 -> OfF
-1416     M_Out(MOUT_PiasAssyResultWr%) = 0         'M6548 -> M305
-1417     M_Out(MOUT_PiasAssyResultOK%) = 0     'M6549 -> M306
-1418     M_Out(MOUT_PiasAssyResultNG%) = 0     'M6550 -> M307    '
-1419     '
-1420     '
-1421     '通過履歴NG 工程抜けの場合
-1422     If MJudge% = MPass% Then
-1423         M_20# = MPass%
+1266         ElseIf MKeyNumber = MContinue% Then     '停止を選択した場合
+1267             M_20# = MContinue%                  'M_20# プログラム間共通外部変数
+1268             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1269             Break
+1270         ElseIf MKeyNumber = MNgProcess% Then    '次へを選択した場合
+1271             M_20# = MNgProcess%                 'M_20# プログラム間共通外部変数
+1272             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1273             Break
+1274         EndIf
+1275     Else
+1276         'OKの場合
+1277         fnPCComuCheck = 1
+1278     EndIf
+1279 FEnd
+1280 '
+1281 '■fnProcessCheck
+1282 ''' <summary>
+1283 ''' 工程抜け確認
+1284 ''' </summary>
+1285 ''' <returns>    1：工程履歴OK     0：異常終了
+1286 '''             -1：前工程履歴NG  -2：自工程履歴あり
+1287 '''             -3：モデル仕向NG  -4：タイムアウト
+1288 '''             -5：履歴処理エラー
+1289 ''' </returns>
+1290 ''' <remarks>
+1291 ''' Date   : 2021/07/07 : M.Hayakawa
+1292 ''' </remarks>'
+1293 Function M% fnProcessCheck
+1294     fnProcessCheck = 0
+1295     MJudge% = MNG%      '一旦NGを初期化とする
+1296 '----------工程抜け確認----------
+1297     MCommentD1001 = 0   'コメント初期化
+1298     For MStaNo = 0 To 5
+1299         M_Out(MOUT_PIAS_Missing_Process%) = 1           'toPLC_PC工程抜け確認要求(M302)
+1300         Wait M_In(11577) = 1                            'M5577  toRBT_PC工程抜け確認統合返信
+1301         '
+1302         If M_In(MIN_PIAS_ProcessHistryOK%) = 1 Then             '11556 履歴OK M407
+1303             MJudge% = MOK%
+1304             fnAutoScreenComment(85)     ' AUTO画面
+1305             MStaNo = 5
+1306             Break
+1307         ElseIf M_In(MIN_PIAS_MyProcessComp%) = 1 Then           '11573 自工程履歴あり M426
+1308             MFlgLoop% = 0
+1309             MJudge% = MNG%
+1310             MCommentD1001 = 27
+1311             MCommentD1002 = 22
+1312             fnAutoScreenComment(94)     ' AUTO画面
+1313             fnProcessCheck = -2         ' NGは-2を返す
+1314             MStaNo = 5
+1315             Break
+1316         ElseIf M_In(MIN_PIAS_ModelTypeNG%) = 1 Then             '11554 モデル仕向NG M406
+1317            MJudge% = MNG%
+1318             MCommentD1001 = 31
+1319             MCommentD1002 = 22
+1320             fnAutoScreenComment(83)     ' AUTO画面
+1321             fnProcessCheck = -3         ' NGは-3を返す
+1322             MStaNo = 5
+1323             Break
+1324         ElseIf M_In(MIN_PIAS_ProcessHistryNG%) = 1 Then         '11555 前工程履歴NG M408
+1325             '履歴NGは直ぐに終了せず繰り返し確認を行う
+1326             '前工程の書込みが終了していない可能性があるため
+1327             MJudge% = MNG%
+1328             MCommentD1001 = 32
+1329             MCommentD1002 = 22
+1330             fnAutoScreenComment(84)     ' AUTO画面
+1331             fnProcessCheck = -1         ' NGは-1を返す
+1332             Dly 1.0
+1333             '工程抜け確認OFF
+1334             M_Out(MOUT_PIAS_Missing_Process%) = 0               'toPLC_PC工程抜け確認要求(M302)
+1335             Dly 1.0
+1336            'MStaNo = 5
+1337             Break
+1338         ElseIf M_In(MIN_PIAS_ProcessHistryErr%) = 1 Then        '11557 履歴処理エラー M432
+1339             MFlgLoop% = 0
+1340             MJudge% = MNG%
+1341             MCommentD1001 = 29
+1342             MCommentD1002 = 22
+1343             fnAutoScreenComment(86)     ' AUTO画面 履歴処理エラー
+1344             fnProcessCheck = -5         ' NGは-5を返す
+1345             MStaNo = 5
+1346             Break
+1347         ElseIf M_In(MIN_PIAS_ProcessHistryTimeOut%) = 1 Then    'タイムアウト
+1348             MJudge% = MNG%
+1349             If MCommentD1001 = 32 Then
+1350                 '何もしない
+1351             Else
+1352                 MCommentD1001 = 26
+1353             EndIf
+1354             MCommentD1002 = 22
+1355             fnProcessCheck = -4         ' NGは-4を返す
+1356             MStaNo = 5
+1357             Break
+1358         Else
+1359             MJudge% = MNG%
+1360             MCommentD1001 = 28
+1361             MCommentD1002 = 22
+1362         EndIf
+1363     Next MStaNo
+1364     '工程抜け確認OFF
+1365     M_Out(MOUT_PIAS_Missing_Process%) = 0      'toPLC_PC工程抜け確認要求(M302)
+1366     '通過履歴NG 工程抜けの場合
+1367     If MJudge% = MPass% Then
+1368         M_20# = MPass%
+1369     EndIf
+1370     '
+1371     'エラー画面
+1372     If MJudge% <> MOK% Then
+1373         M_20# = MClear%     '初期化
+1374         'エラー処理記述
+1375         fnWindScreenOpen(MWindErrScr3, MCommentD1001, MCommentD1002, 0)
+1376         'GOT KEY入力待ち
+1377         MKeyNumber = fnKEY_WAIT()
+1378         '
+1379         Select MKeyNumber
+1380             Case MAbout%        '停止を選択した場合
+1381                 M_20# = MAbout%         'M_20# プログラム間共通外部変数
+1382                 fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1383                 Break
+1384             Case MNext%         '次へを選択した場合
+1385                 M_20# = MPass%          'M_20# プログラム間共通外部変数
+1386                 fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1387                 Break
+1388             Case MContinue%     '継続を選択した場合
+1389                 M_20# = MContinue%      'M_20# プログラム間共通外部変数
+1390                 fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1391                 Break
+1392             Case MNgProcess%    'NGを選択した場合
+1393                 M_20# = MNgProcess%     'M_20# プログラム間共通外部変数
+1394                 fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1395                 Break
+1396         End Select
+1397     Else
+1398         fnProcessCheck = 1  ' OKは1を返す
+1399     EndIf
+1400 FEnd
+1401 '
+1402 '■fnPiasWrite
+1403 ''' <summary>
+1404 ''' Pias 組立結果書込み要求
+1405 ''' </summary>
+1406 '''<param name="MFlg%">
+1407 '''                 MOK%(1) = 工程履歴にOKを書込む
+1408 '''                 MNG%(0) = 工程履歴にNGを書込む
+1409 '''</param>
+1410 '''<returns></returns>
+1411 ''' <remarks>
+1412 ''' Date   : 2021/07/07 : M.Hayakawa
+1413 ''' </remarks>'
+1414 Function M% fnPiasWrite(ByVal MFlg%)
+1415       fnPiasWrite = 0
+1416 *RETRY_PIASWRITE
+1417     '
+1418     '組立OK(MOK%)の場合　M306 ON
+1419    '組立NG(MNG%)の場合　M307 ON
+1420     If MFlg% = MOK% Then
+1421         M_Out(MOUT_PiasAssyResultOK%) = 1     'M6549 -> M306
+1422     Else
+1423         M_Out(MOUT_PiasAssyResultNG%) = 1     'M6550 -> M307
 1424     EndIf
-1425     '
-1426    M_20# = MClear%     '初期化
-1427     '
-1428     'エラー画面
-1429     If MJudge% < MOK% Then
+1425     Dly 0.1                  '念のため
+1426     '
+1427     'Piasへ書込み開始 M305 -> ON
+1428     M_Out(MOUT_PiasAssyResultWr%) = 1         'M6548 -> M305
+1429     Wait M_In(11582) = 1                        '組立完了統合返信 M5582
 1430     '
-1431 '残しておくが現状では使用しないラベル
-1432 *RETRY_ERR_WRITE
-1433         M_20# = MClear%     '初期化
-1434         'エラー処理記述
-1435         fnWindScreenOpen(MWindErrScr3, MCommentD1001, MCommentD1002, 0)
-1436         'GOT KEY入力待ち
-1437         MKeyNumber = fnKEY_WAIT()
-1438         '
-1439         If MKeyNumber = MAbout% Then   '停止を選択した場合
-1440             M_20# = MAbout%            'M_20# プログラム間共通外部変数
-1441            fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1442             Break
-1443         '
-1444         ElseIf MKeyNumber = MContinue% Then   '継続を選択した場合
-1445             M_20# = MContinue%            'M_20# プログラム間共通外部変数
-1446             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1431     MJudge% = MNG%
+1432     '
+1433     For MStaNo = 0 To 5
+1434         If M_In(MIN_PiasProcessOK%) = 1 Then          'M414 工程履歴処理OK
+1435             MJudge% = MOK%
+1436             'MRet = fnAutoScreenComment(85)  'AUTO画面
+1437             MStaNo = 5
+1438             Break
+1439         '
+1440         ElseIf M_In(MIN_PiasProcessNG%) = 1 Then          'M415 工程履歴処理NG
+1441             MJudge% = MNG%
+1442             'MRet = fnAutoScreenComment(85)  'AUTO画面
+1443            MCommentD1001 = 34
+1444            MCommentD1002 = 25
+1445             MStaNo = 5
+1446             Break
 1447         '
-1448         ElseIf MKeyNumber = MNext% Then   '次へを選択した場合
-1449             M_20# = MPass%            'M_20# プログラム間共通外部変数
-1450             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1451         '
-1452         ElseIf MKeyNumber = MNgProcess% Then   '停止を選択した場合
-1453             M_20# = MNgProcess%            'M_20# プログラム間共通外部変数
-1454            fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1455             Break
-1456         '
-1457         EndIf
-1458         '
-1459         If M_20# = MClear% Then *RETRY_ERR_WRITE
-1460         '
-1461     EndIf
-1462     '
-1463     If M_20# = MContinue% Then *RETRY_PIASWRITE
-1464     '
-1465     fnPiasWrite = 1
-1466     '
-1467 FEnd
-1468 '
-1469 '■fnPCBNumberCheck
-1470 ''' <summary>
-1471 ''' Pias 基板番号照合要求
-1472 ''' </summary>
-1473 '''<param name="%"></param>
-1474 '''<param name="%"></param>
-1475 '''<returns></returns>
-1476 ''' <remarks>
-1477 ''' Date   : 2021/07/07 : M.Hayakawa
-1478 ''' </remarks>'
-1479 Function M% fnPCBNumberCheck
-1480       fnPCBNumberCheck = 0
-1481     '
-1482 *RETRY_PCBCHECK
-1483     fnAutoScreenComment(91)  'AUTO画面 基板情報書込み
-1484     'Piasへ基板照合開始 M310 -> ON
-1485     M_Out(MOUT_PiasPCBNumberCheck%) = 1         'M6557 -> M310
-1486     Wait M_In(11579) = 1                        '基板番号統合返信 M5579
-1487     '
-1488     MJudge% = MNG%
-1489     '
-1490     For MStaNo = 0 To 5
-1491         If M_In(MIN_PiasPCBNumberOK%) = 1 Then              'M420 基板番号処理OK
-1492             MJudge% = MOK%
-1493             fnAutoScreenComment(96)  'AUTO画面
-1494             MStaNo = 5
-1495             Break
+1448         ElseIf M_In(MIN_PiasProcessOtherErr%) = 1 Then         'M435 工程履歴処理エラー(なんかのトラブル)
+1449             MJudge% = MNG%
+1450             'MRet = fnAutoScreenComment(85)  'AUTO画面
+1451            MCommentD1001 = 35
+1452            MCommentD1002 = 25
+1453             MStaNo = 5
+1454             Break
+1455         '
+1456         ElseIf M_In(11583) = 1 Then                         '工程履歴処理time out
+1457             MJudge% = MNG%
+1458             'MRet = fnAutoScreenComment(85)  'AUTO画面
+1459            MCommentD1001 = 36
+1460            MCommentD1002 = 25
+1461             MStaNo = 5
+1462             Break
+1463         '
+1464         Else
+1465             MJudge% = MNG%
+1466            MCommentD1001 = 42
+1467            MCommentD1002 = 25
+1468         '
+1469         EndIf
+1470         '
+1471     Next MStaNo
+1472     '
+1473     'Piasへ書込み開始 M305 -> OfF
+1474     M_Out(MOUT_PiasAssyResultWr%) = 0         'M6548 -> M305
+1475     M_Out(MOUT_PiasAssyResultOK%) = 0     'M6549 -> M306
+1476     M_Out(MOUT_PiasAssyResultNG%) = 0     'M6550 -> M307    '
+1477     '
+1478     '
+1479     '通過履歴NG 工程抜けの場合
+1480     If MJudge% = MPass% Then
+1481         M_20# = MPass%
+1482     EndIf
+1483     '
+1484    M_20# = MClear%     '初期化
+1485     '
+1486     'エラー画面
+1487     If MJudge% < MOK% Then
+1488     '
+1489 '残しておくが現状では使用しないラベル
+1490 *RETRY_ERR_WRITE
+1491         M_20# = MClear%     '初期化
+1492         'エラー処理記述
+1493         fnWindScreenOpen(MWindErrScr3, MCommentD1001, MCommentD1002, 0)
+1494         'GOT KEY入力待ち
+1495         MKeyNumber = fnKEY_WAIT()
 1496         '
-1497         ElseIf M_In(MIN_PiasPCBNumberNG%) = 1 Then          'M421 基板番号NG
-1498             MJudge% = MNG%
-1499             fnAutoScreenComment(97)  'AUTO画面
-1500             MCommentD1001 = 37
-1501             MCommentD1002 = 25
-1502             MStaNo = 5
-1503             Break
-1504         '
-1505         ElseIf M_In(MIN_PiasPCBNumberErr%) = 1 Then         'M440 基板番号処理エラー(なんかのトラブル)
-1506             MJudge% = MNG%
-1507             fnAutoScreenComment(98)  'AUTO画面
-1508             MCommentD1001 = 38
-1509             MCommentD1002 = 25
-1510             MStaNo = 5
-1511             Break
-1512         '
-1513         ElseIf M_In(11580) = 1 Then                         'time out
-1514             MJudge% = MNG%
-1515             fnAutoScreenComment(99)  'AUTO画面
-1516             MCommentD1001 = 39
-1517             MCommentD1002 = 25
-1518             MStaNo = 5
-1519             Break
-1520         '
-1521         Else
-1522             MJudge% = MNG%
-1523            MCommentD1001 = 41
-1524            MCommentD1002 = 25
-1525         '
-1526         EndIf
-1527         '
-1528     Next MStaNo
-1529     '
-1530     'Piasへ基板照合開始 M310 -> OfF
-1531     M_Out(MOUT_PiasPCBNumberCheck%) = 0         'M6557 -> M310
-1532     '
-1533     '
-1534     '通過履歴NG 工程抜けの場合
-1535     If MJudge% = MPass% Then
-1536         M_20# = MPass%
-1537     EndIf
-1538     '
-1539    M_20# = MClear%     '初期化
-1540     '
-1541     'エラー画面
-1542     If MJudge% < MOK% Then
-1543     '
-1544 '残しておくが現状では使用しないラベル
-1545 *RETRY_ERR_PCBNUMBER
-1546         M_20# = MClear%     '初期化
-1547         'エラー処理記述
-1548         fnWindScreenOpen(MWindErrScr3, MCommentD1001, MCommentD1002, 0)
-1549         'GOT KEY入力待ち
-1550         MKeyNumber = fnKEY_WAIT()
-1551         '
-1552         If MKeyNumber = MAbout% Then   '停止を選択した場合
-1553             M_20# = MAbout%            'M_20# プログラム間共通外部変数
-1554             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1555             Break
-1556         '
-1557         ElseIf MKeyNumber = MContinue% Then   '継続を選択した場合
-1558             M_20# = MContinue%            'M_20# プログラム間共通外部変数
-1559             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1560         '
-1561         ElseIf MKeyNumber = MNext% Then   '次へを選択した場合
-1562             M_20# = MPass%            'M_20# プログラム間共通外部変数
-1563             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1564         '
-1565         ElseIf MKeyNumber = MNgProcess% Then   '停止を選択した場合
-1566             M_20# = MNgProcess%            'M_20# プログラム間共通外部変数
-1567             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-1568             Break
-1569         '
-1570         EndIf
-1571         '
-1572         If M_20# = MClear% Then *RETRY_ERR_PCBNUMBER
-1573         '
-1574     EndIf
-1575     '
-1576     If M_20# = MContinue% Then *RETRY_PCBCHECK
-1577 FEnd
-1578 '
-1579 '■ScrewTight_S2
-1580 ''' <summary>
-1581 ''' ねじ締めを行う
-1582 ''' </summary>
-1583 '''<param name="PScrewPos()">
-1584 '''             PScrewPos(1)    ：パレット上ねじ締めS①の安全回避位置  +30
-1585 '''             PScrewPos(2)    ：ねじ締め回避点
-1586 '''             PScrewPos(10)   ：ねじ締め終了高さ
-1587 '''</param>
-1588 '''<returns>整数
-1589 '''         0=異常終了、1=正常終了
-1590 '''</returns>
-1591 ''' <remarks>
-1592 ''' Date   : 2021/07/07 : M.Hayakawa
-1593 ''' </remarks>'
-1594 Function M% ScrewTight_S2(ByVal PScrewPosition())   'ネジ締め個別設定
-1595     ScrewTight_S2 = 0
-1596     MOKNGFlg = 0
-1597     Ovrd 100
-1598     Mvs PScrewPosition(1)        ' パレット上ねじ締めS①の安全回避位置
-1599     ' 暫定
-1600     Ovrd 5
-1601     Mvs PScrewPosition(10),-10    ' パレット上ねじ締めS①の上空へ移動
-1602 '    Ovrd MOvrdA
-1603     '暫定マスク
-1604 '    M_Out(Y62_Driver)=1     ' バンクセッティング　C1
-1605 '    Dly 0.1
-1606 '    M_Out(Y61_Driver)=1     'ドライバーON　CW
-1607 '    'Spd 8.3 '外部ライド100  内部ライド60   'ライド100-40　100%：Spd　15　'ねじ締め速度設定
-1608 '    Spd MSpdA               'ネジ締め時Spd個別設定
-1609     ' 暫定移動のみ
-1610     Mvs PScrewPosition(10)
-1611 '    '
-1612 '    Dly 0.1
-1613 '    Mvs PScrewPos(2) WthIf M_In(11584)=1,Skip   'ねじ締め終了高さまで移動中エラー検出
-1614 '    Wait M_In(11584)=1          '完了/エラー検出
-1615 '    Dly 0.1
-1616 '    Spd M_NSpd
-1617 '    '
-1618 '    If M_In(X28_Driver)=1 Then  'ねじトータルエラー検出時
-1619 '        M_Out(Y61_Driver)=0     'ドライバーOFF　CW
-1620 '        Dly 0.1
-1621 '        M_Out(Y62_Driver)=0     'バンクセッティング解除　C1
-1622 '        Dly 0.1
-1623 '        M_Out(Y63_Driver)=0     'バンクセッティング解除　C1
-1624 '        Dly 0.1
-1625 '        M_Out(Y65_Driver)=0     'プログラム解除　F1
-1626 '        Mvs PScrewPos(2),-80    'パレット上ねじ締めS①の上空へ移動
-1627 '        M_Out(Y6A_VV1)=0        'ねじ吸着　OFF
-1628 '        MOKNGFlg = -1
-1629 '        ScrewTight_S2 = 0
-1630 '    Else
-1631 '        Wait M_In(X29_Driver)=1 ' 正常完了時
-1632 '        Dly 0.1
-1633 '        M_Out(Y61_Driver)=0     'ドライバーOFF　CW
-1634 '        Dly 0.1
-1635 '        M_Out(Y62_Driver)=0     'バンクセッティング解除
-1636 '        Dly 0.1
-1637 '        M_Out(Y6A_VV1)=0        'ねじ吸着　OFF
-1638 '        Dly 0.1
-1639 '        Mvs PScrewPos(2),-80    'パレット上ねじ締めS①の上空へ移動
-1640 '        ScrewTight_S2 = 1
-1641 '    EndIf
-1642 ' 暫定
-1643     Ovrd 10
-1644     Mvs PScrewPosition(1)        ' パレット上ねじ締めS①の安全回避位置
-1645     Ovrd 100
-1646 FEnd
-1647 '
-1648 '■ScrewGet_S3
-1649 ''' <summary>
-1650 ''' ねじ供給機からねじを得る
-1651 ''' </summary>
-1652 '''<param name="%"></param>
-1653 '''         PScrewPos(1)    ：ねじ供給器のねじ上空
-1654 '''         PScrewPos(2)    ：ねじ供給器回避点
-1655 '''         PScrewPos(10)   ：ねじ供給器のねじピックアップ位置：ねじ頭とビットとのクリアランスは0.3mmが理想
-1656 '''         PScrewPos(3)    ：Mねじポカヨケ位置
-1657 '''         PScrewPos(4)    ：Mねじポカヨケ位置　上空
-1658 '''<returns>整数
-1659 '''         0=異常終了、1=正常終了、-1=MネジセンサーNG、-2=MネジセンサーON、-3=吸着エラー
-1660 '''</returns>
-1661 ''' <remarks>
-1662 ''' Date   : 2021/07/07 : M.Hayakawa
-1663 ''' </remarks>'
-1664 Function M% ScrewGet_S3(ByVal PScrewPosition())
-1665     ScrewGet_S3 = 0
-1666     MMScrewJudge% = 0
-1667     'ねじ供給器初期動作エラーチェック
-1668 ' ↓暫定削除
-1669 '    Wait M_In(X34_ScrewReady1)=1 'ねじ供給器SがReadyになるまで待つ　←　何秒か待ってReadyにならなければ抜けるプログラムが必要？
-1670 '    Ovrd 100
-1671 '    If M_In(X33_SS2)=0 Then  'Mねじ検出センサがOFF（故障）していた場合
-1672 '        Ovrd 30
-1673 '        Mvs,-80             'その場所から80mm上空へ移動
-1674 '        Mov PInitPos19049   '19049初期位置へ移動
-1675 '        M_Out(Y6A_VV1)=0    'ねじ吸着 Off
-1676 '        'NGとしてここの関数から抜ける
-1677 '        ScrewGet_S3 = -1
-1678 '        MMScrewJudge% = 1
-1679 '        MCommentD1001 = 61
-1680 '    EndIf
-1681 '    If ScrewGet_S3 = 0 Then
-1682 '        'Sタイト用ねじ供給機にMねじが混入していないか監視
-1683 '        MMScrewJudge% = 0 'MMScrewJudgeを初期化する
-1684 '        MRtn = frInCheck(X32_SS1, 0, MSETTIMEOUT01&)
-1685 '        If MRtn = 0 Then
-1686 '            Ovrd 30
-1687 '            Mvs,-80            'その場所から50mm上空へ移動
-1688 '            Mov PInitPos19049  '19049初期位置へ移動
-1689 '            MMScrewJudge% = 2
-1690 '            MRtn = All_CLamp_Release()'全てのクランプ解除へ分岐
-1691 '            MCnt% = 2   '2を設定
-1692 '            MCommentD1001 = 62
-1693 '        EndIf
-1694 '        If MMScrewJudge% = 2 Then
-1695 '            ScrewGet_S3 = -2
-1696 '        EndIf
-1697 '    EndIf
-1698 '    'Mネジ判定がONの場合 NGとして関数を抜ける
-1699 '    If MMScrewJudge% = 2 Then
-1700 '        ScrewGet_S3 = -2
-1701 '    EndIf
-1702     'Sネジ用ねじ太郎のMネジ混入確認用ここまで
+1497         If MKeyNumber = MAbout% Then   '停止を選択した場合
+1498             M_20# = MAbout%            'M_20# プログラム間共通外部変数
+1499            fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1500             Break
+1501         '
+1502         ElseIf MKeyNumber = MContinue% Then   '継続を選択した場合
+1503             M_20# = MContinue%            'M_20# プログラム間共通外部変数
+1504             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1505         '
+1506         ElseIf MKeyNumber = MNext% Then   '次へを選択した場合
+1507             M_20# = MPass%            'M_20# プログラム間共通外部変数
+1508             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1509         '
+1510         ElseIf MKeyNumber = MNgProcess% Then   '停止を選択した場合
+1511             M_20# = MNgProcess%            'M_20# プログラム間共通外部変数
+1512            fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1513             Break
+1514         '
+1515         EndIf
+1516         '
+1517         If M_20# = MClear% Then *RETRY_ERR_WRITE
+1518         '
+1519     EndIf
+1520     '
+1521     If M_20# = MContinue% Then *RETRY_PIASWRITE
+1522     '
+1523     fnPiasWrite = 1
+1524     '
+1525 FEnd
+1526 '
+1527 '■fnPCBNumberCheck
+1528 ''' <summary>
+1529 ''' Pias 基板番号照合要求
+1530 ''' </summary>
+1531 '''<param name="%"></param>
+1532 '''<param name="%"></param>
+1533 '''<returns></returns>
+1534 ''' <remarks>
+1535 ''' Date   : 2021/07/07 : M.Hayakawa
+1536 ''' </remarks>'
+1537 Function M% fnPCBNumberCheck
+1538       fnPCBNumberCheck = 0
+1539     '
+1540 *RETRY_PCBCHECK
+1541     fnAutoScreenComment(91)  'AUTO画面 基板情報書込み
+1542     'Piasへ基板照合開始 M310 -> ON
+1543     M_Out(MOUT_PiasPCBNumberCheck%) = 1         'M6557 -> M310
+1544     Wait M_In(11579) = 1                        '基板番号統合返信 M5579
+1545     '
+1546     MJudge% = MNG%
+1547     '
+1548     For MStaNo = 0 To 5
+1549         If M_In(MIN_PiasPCBNumberOK%) = 1 Then              'M420 基板番号処理OK
+1550             MJudge% = MOK%
+1551             fnAutoScreenComment(96)  'AUTO画面
+1552             MStaNo = 5
+1553             Break
+1554         '
+1555         ElseIf M_In(MIN_PiasPCBNumberNG%) = 1 Then          'M421 基板番号NG
+1556             MJudge% = MNG%
+1557             fnAutoScreenComment(97)  'AUTO画面
+1558             MCommentD1001 = 37
+1559             MCommentD1002 = 25
+1560             MStaNo = 5
+1561             Break
+1562         '
+1563         ElseIf M_In(MIN_PiasPCBNumberErr%) = 1 Then         'M440 基板番号処理エラー(なんかのトラブル)
+1564             MJudge% = MNG%
+1565             fnAutoScreenComment(98)  'AUTO画面
+1566             MCommentD1001 = 38
+1567             MCommentD1002 = 25
+1568             MStaNo = 5
+1569             Break
+1570         '
+1571         ElseIf M_In(11580) = 1 Then                         'time out
+1572             MJudge% = MNG%
+1573             fnAutoScreenComment(99)  'AUTO画面
+1574             MCommentD1001 = 39
+1575             MCommentD1002 = 25
+1576             MStaNo = 5
+1577             Break
+1578         '
+1579         Else
+1580             MJudge% = MNG%
+1581            MCommentD1001 = 41
+1582            MCommentD1002 = 25
+1583         '
+1584         EndIf
+1585         '
+1586     Next MStaNo
+1587     '
+1588     'Piasへ基板照合開始 M310 -> OfF
+1589     M_Out(MOUT_PiasPCBNumberCheck%) = 0         'M6557 -> M310
+1590     '
+1591     '
+1592     '通過履歴NG 工程抜けの場合
+1593     If MJudge% = MPass% Then
+1594         M_20# = MPass%
+1595     EndIf
+1596     '
+1597    M_20# = MClear%     '初期化
+1598     '
+1599     'エラー画面
+1600     If MJudge% < MOK% Then
+1601     '
+1602 '残しておくが現状では使用しないラベル
+1603 *RETRY_ERR_PCBNUMBER
+1604         M_20# = MClear%     '初期化
+1605         'エラー処理記述
+1606         fnWindScreenOpen(MWindErrScr3, MCommentD1001, MCommentD1002, 0)
+1607         'GOT KEY入力待ち
+1608         MKeyNumber = fnKEY_WAIT()
+1609         '
+1610         If MKeyNumber = MAbout% Then   '停止を選択した場合
+1611             M_20# = MAbout%            'M_20# プログラム間共通外部変数
+1612             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1613             Break
+1614         '
+1615         ElseIf MKeyNumber = MContinue% Then   '継続を選択した場合
+1616             M_20# = MContinue%            'M_20# プログラム間共通外部変数
+1617             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1618         '
+1619         ElseIf MKeyNumber = MNext% Then   '次へを選択した場合
+1620             M_20# = MPass%            'M_20# プログラム間共通外部変数
+1621             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1622         '
+1623         ElseIf MKeyNumber = MNgProcess% Then   '停止を選択した場合
+1624             M_20# = MNgProcess%            'M_20# プログラム間共通外部変数
+1625             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+1626             Break
+1627         '
+1628         EndIf
+1629         '
+1630         If M_20# = MClear% Then *RETRY_ERR_PCBNUMBER
+1631         '
+1632     EndIf
+1633     '
+1634     If M_20# = MContinue% Then *RETRY_PCBCHECK
+1635 FEnd
+1636 '
+1637 '■ScrewTight_S2
+1638 ''' <summary>
+1639 ''' ねじ締めを行う
+1640 ''' </summary>
+1641 '''<param name="PScrewPos()">
+1642 '''             PScrewPos(1)    ：パレット上ねじ締めS①の安全回避位置  +30
+1643 '''             PScrewPos(2)    ：ねじ締め回避点
+1644 '''             PScrewPos(10)   ：ねじ締め終了高さ
+1645 '''</param>
+1646 '''<returns>整数
+1647 '''         0=異常終了、1=正常終了
+1648 '''</returns>
+1649 ''' <remarks>
+1650 ''' Date   : 2021/07/07 : M.Hayakawa
+1651 ''' </remarks>'
+1652 Function M% ScrewTight_S2(ByVal PScrewPosition())   'ネジ締め個別設定
+1653     ScrewTight_S2 = 0
+1654     MOKNGFlg = 0
+1655     Ovrd 100
+1656     Mvs PScrewPosition(1)        ' パレット上ねじ締めS①の安全回避位置
+1657     ' 暫定
+1658     Ovrd 5
+1659     Mvs PScrewPosition(10),-10    ' パレット上ねじ締めS①の上空へ移動
+1660 '    Ovrd MOvrdA
+1661     '暫定マスク
+1662 '    M_Out(Y62_Driver)=1     ' バンクセッティング　C1
+1663 '    Dly 0.1
+1664 '    M_Out(Y61_Driver)=1     'ドライバーON　CW
+1665 '    'Spd 8.3 '外部ライド100  内部ライド60   'ライド100-40　100%：Spd　15　'ねじ締め速度設定
+1666 '    Spd MSpdA               'ネジ締め時Spd個別設定
+1667     ' 暫定移動のみ
+1668     Mvs PScrewPosition(10)
+1669 '    '
+1670 '    Dly 0.1
+1671 '    Mvs PScrewPos(2) WthIf M_In(11584)=1,Skip   'ねじ締め終了高さまで移動中エラー検出
+1672 '    Wait M_In(11584)=1          '完了/エラー検出
+1673 '    Dly 0.1
+1674 '    Spd M_NSpd
+1675 '    '
+1676 '    If M_In(X28_Driver)=1 Then  'ねじトータルエラー検出時
+1677 '        M_Out(Y61_Driver)=0     'ドライバーOFF　CW
+1678 '        Dly 0.1
+1679 '        M_Out(Y62_Driver)=0     'バンクセッティング解除　C1
+1680 '        Dly 0.1
+1681 '        M_Out(Y63_Driver)=0     'バンクセッティング解除　C1
+1682 '        Dly 0.1
+1683 '        M_Out(Y65_Driver)=0     'プログラム解除　F1
+1684 '        Mvs PScrewPos(2),-80    'パレット上ねじ締めS①の上空へ移動
+1685 '        M_Out(Y6A_VV1)=0        'ねじ吸着　OFF
+1686 '        MOKNGFlg = -1
+1687 '        ScrewTight_S2 = 0
+1688 '    Else
+1689 '        Wait M_In(X29_Driver)=1 ' 正常完了時
+1690 '        Dly 0.1
+1691 '        M_Out(Y61_Driver)=0     'ドライバーOFF　CW
+1692 '        Dly 0.1
+1693 '        M_Out(Y62_Driver)=0     'バンクセッティング解除
+1694 '        Dly 0.1
+1695 '        M_Out(Y6A_VV1)=0        'ねじ吸着　OFF
+1696 '        Dly 0.1
+1697 '        Mvs PScrewPos(2),-80    'パレット上ねじ締めS①の上空へ移動
+1698 '        ScrewTight_S2 = 1
+1699 '    EndIf
+1700 ' 暫定
+1701     Ovrd 10
+1702     Mvs PScrewPosition(1)        ' パレット上ねじ締めS①の安全回避位置
 1703     Ovrd 100
-1704     Spd M_NSpd
-1705     If MMScrewJudge% = 0 Then
-1706         ScrewGet_S3 = 0
-1707         M_Out(Y63_Driver)=1         ' バンクセッティング　C2
-1708         MScrewCnt% = 0
-1709         MFinCnt% = 2
-1710 '        For MCnt% = 0 To MFinCnt%
-1711             Mov PScrewPosition(2)        ' ねじ供給機回避点
-1712             Mov PScrewPosition(1)        ' ねじ供給機(Sネジ）上空
-1713             Ovrd 80
-1714             'ねじっこ(Sネジ）ねじピックアップ位置：ねじ頭とビットとのクリアランスは0.3mmが理想
-1715             'ネジとビット篏合させる 吸着位置から1.2下げて篏合
-1716             Mvs PScrewPosition(10), 1.2
-1717             M_Out(Y6A_VV1)=1        ' ねじ吸着　ON
-1718             'ビット回転
-1719             M_Out(Y60_Driver)=1
-1720             Dly 0.2
-1721             '
-1722             Ovrd 100
-1723             JOvrd M_NJovrd
-1724             Spd M_NSpd
-1725             'ネジ吸着確認位置移動
-1726             Mvs PScrewPosition(10)       ' 念のため一旦、旧ねじ吸着位置
-1727             Mvs PScrewPosition(10), -15  ' ネジ吸着確認位置
-1728             'ビット回転停止
-1729             'M_Out(Y60_Driver)=0
-1730             '
-1731             '1秒間ネジ吸着確認
-1732 ' 以下暫定削除
-1733 '            MRtn = frInCheck(X2B_VS1, 1, MSETTIMEOUT01&)
-1734 '            'MRtn = 0'強制エラー
-1735 '            '吸着エラーの場合
-1736 '            'ネジをねじ太郎に戻す
-1737 '            If MRtn = 0 Then
-1738 '                Ovrd 30
-1739 '                'ビット回転停止
-1740 '                M_Out(Y60_Driver)=0
-1741 '                'ネジ供給機上空
-1742 '                Mvs PScrewPos(1)
-1743 '                '更に上空
-1744 '                Mov PScrewPos(1), -75
-1745 '                'ネジ捨て位置
-1746 '                Mov PScrewFeedS021
-1747 '                '吸着OFF
-1748 '                M_Out(Y6A_VV1)=0 'ねじ吸着　OFF
-1749 '                Dly 0.2
-1750 '                '破壊ON
-1751 '                M_Out(Y6B_VB1)=1 '真空破壊ON
-1752 '                'ビット回転
-1753 '                M_Out(Y61_Driver)=1
-1754 '                Dly 0.5
-1755 '                '
-1756 '                Ovrd 100
-1757 '                JOvrd M_NJovrd
-1758 '                Spd M_NSpd
-1759 '                'ドライバーを上下させねじを振り落とす
-1760 '                Mov PScrewFeedS021, 10
-1761 '                Mov PScrewFeedS021
-1762 '                Dly 0.1
-1763 '                Mov PScrewFeedS021, 10
-1764 '                Mov PScrewFeedS021
-1765 '                '
-1766 '                'ネジ落ち待ち
-1767 '                'ビット回転停止
-1768 '                M_Out(Y61_Driver)=0
-1769 '                Dly 0.1
-1770 '                '破壊OFF
-1771 '                M_Out(Y6B_VB1)=0 '真空破壊OFF
-1772 '                '
-1773 '                '
-1774 '                'ねじ落ちたとして、移動更に上空
-1775 '                Mov PScrewPos(1), -75
-1776 '                Ovrd 100
-1777 '                Spd M_NSpd
-1778 '                'ネジ供給機上空
-1779 '                Mvs PScrewPos(1)
-1780 '                '
-1781 '                ScrewGet_S3 = -3
-1782 '                Break
-1783 '                '
-1784 '            Else
-1785 '                MCnt% = MFinCnt%
-1786 '                ScrewGet_S3 = 0
-1787 '            EndIf
-1788 '        Next  MCnt%
-1789         '
-1790         Ovrd 100
-1791         Spd M_NSpd
-1792         Mvs PScrewPosition(10), -15  ' ねじピックアップ位置 -15mm
-1793         M_Out(Y60_Driver)=0     ' ビット回転停止
-1794         M_Out(Y63_Driver)=0     ' バンクセッティング　C2
-1795         Mvs PScrewPosition(10), -15  ' ねじピックアップ位置 -15mm
-1796         'もう一度吸着確認
-1797 ' 以下暫定削除
-1798 '        MRtn = frInCheck(X2B_VS1, 1, MSETTIMEOUT01&)
-1799 '        If MRtn = 0 Then      '吸着エラーの場合
-1800 '            MCommentD1001 = 94
-1801 '            MCommentD1002 = 95
-1802 '            ScrewGet_S3 = -3
-1803 '        EndIf
-1804 '        If MRtn = 1 Then      '吸着OKの場合
-1805 '            ScrewGet_S3 = 1
-1806 '        EndIf
-1807 '        Break
-1808     Else
-1809         'Mネジ
-1810         If MMScrewJudge% = 2 Then
-1811             ScrewGet_S3 = -2
-1812         EndIf
-1813     EndIf
-1814 FEnd
-1815 '
-1816 '■fnKEY_WAIT()
-1817 ''' <summary>
-1818 ''' GOTからのキー入力待ち
-1819 ''' </summary>
-1820 '''<returns>1：停止    2：次へ
-1821 '''         3：継続    4：トルクチェック開始
-1822 '''         5：NG
-1823 '''         11：ロボット初期位置1    12：ロボット初期位置2
-1824 '''         13：ロボット初期位置3    14：ロボット初期位置4
-1825 '''</returns>
-1826 ''' <remarks>
-1827 ''' Date   : 2021/07/07 : M.Hayakawa
-1828 ''' </remarks>'
-1829 Function M% fnKEY_WAIT()
-1830     fnKEY_WAIT = 0
-1831     M_Out(MOUT_GREEN_LIGHT%) = 0        'PATLIGHT 青点灯
-1832     M_Out(MOUT_RED_FLASH%) = 1          'PATLIGHT 赤点滅
-1833     MRtn = fnAUTO_CTL()                        'AUTOモード停止、継続キー入力待ち
-1834     '下記キー待ちの継続に反応させないため
-1835     Wait M_In(11347) = 0                'toRBT_継続の完了待ち
-1836     Dly 0.2
-1837     Wait M_In(11347) = 0                'toRBT_継続の完了待ち　2重確認
-1838     MLocalLoopFlg=1
-1839     While MLocalLoopFlg=1
-1840         If M_In(11345) = 1 Then         '停止   M5345
-1841             M_Out(12343) = 1 Dly 0.5    '停止要求受信パルス M6343
-1842             fnKEY_WAIT = 1
-1843             MLocalLoopFlg=-1
-1844             Break
-1845         ElseIf M_In(11346) = 1 Then     'fromPLC_次へ   M5346
-1846             M_Out(12348) = 1 Dly 1.0    '次へ要求受信パルス M6348
-1847             fnKEY_WAIT = 2
-1848             MLocalLoopFlg=-1
-1849             Break
-1850         ElseIf M_In(11356) = 1 Then     'fromPLC_継続2  M5356
-1851             M_Out(12344) = 1 Dly 1.0    'toPLC_RBT継続2要求受信 M6344
-1852             fnKEY_WAIT = 3
-1853             MLocalLoopFlg=-1
-1854             Break
-1855         ElseIf M_In(11355) = 1 Then     'fromPLC_トルクチェック開始要求
-1856             M_Out(12342) = 1 Dly 0.5    'toPLC_RBTトルクチェック開始要求受信パルス M6342
-1857             fnKEY_WAIT = 4
-1858             MLocalLoopFlg=-1
-1859             Break
-1860         ElseIf M_In(11357) = 1 Then     'fromPLC_NG要求
-1861             M_Out(12349) = 1 Dly 1.0    'toPLC_NG受信パルス M6349
-1862             fnKEY_WAIT = 5
-1863             MLocalLoopFlg=-1
-1864             Break
-1865             '
-1866         ElseIf M_In(MIN_INIT1REQUEST%) = 1 Then     'toRBT_ロボット初期位置1要求 M5568
-1867             M_Out(MOUT_INIT1RECIVE%) = 1 Dly 1.0    'toPLC_ロボット初期位置1受信 M6560
-1868             fnKEY_WAIT = MRobotInit1%
-1869             MLocalLoopFlg=-1
-1870             Break
-1871             '
-1872         ElseIf M_In(MIN_INIT2REQUEST%) = 1 Then     'toRBT_ロボット初期位置2要求 M5569
-1873             M_Out(MOUT_INIT2RECIVE%) = 1 Dly 0.1    'toPLC_ロボット初期位置2受信 M6561
-1874             fnKEY_WAIT = MRobotInit2%
-1875             MLocalLoopFlg=-1
-1876             Break
-1877             '
-1878         ElseIf M_In(MIN_INIT3REQUEST%) = 1 Then     'toRBT_ロボット初期位置3要求 M5570
-1879             M_Out(MOUT_INIT3RECIVE%) = 1 Dly 1.0    'toPLC_ロボット初期位置3受信 M6562
-1880             fnKEY_WAIT = MRobotInit3%
-1881             MLocalLoopFlg=-1
-1882             Break
-1883             '
-1884         ElseIf M_In(MIN_INIT4REQUEST%) = 1 Then     'toRBT_ロボット初期位置4要求 M5571
-1885             M_Out(MOUT_INIT4RECIVE%) = 1 Dly 1.0    'toPLC_ロボット初期位置4受信 M6563
-1886             fnKEY_WAIT = MRobotInit4%
-1887             MLocalLoopFlg=-1
-1888             Break
-1889             '
-1890         Else
-1891         EndIf
-1892     WEnd
-1893     M_Out(MOUT_GREEN_LIGHT%) = 1                    'PATLIGHT 青点灯
-1894     M_Out(MOUT_RED_FLASH%) = 0                      'PATLIGHT 赤点滅
-1895 FEnd
-1896 '
-1897 '■ fnAUTO_CTL
-1898 ''' <summary>
-1899 ''' AUTOモードOFF、PLCからの開始待ち
-1900 ''' </summary>
-1901 ''' <remarks>
-1902 ''' Date   : 2021/07/07 : M.Hayakawa
-1903 ''' </remarks>
-1904 Function M% fnAUTO_CTL
-1905     fnAUTO_CTL = 0
-1906     M_Out(12355) = 1            'toPLC_AUTO_MODE_OFF M6355
-1907     Wait M_In(11347) = 1        'toRBT_継続　の指示待ち  M5347
-1908     M_Out(12355) = 0            'toPLC_AUTO_MODE_OFF M6355
-1909     '
-1910     If M_Svo=0 Then             'サーボON確認
-1911         Servo On
-1912     EndIf
-1913     Wait M_Svo=1
-1914 FEnd
-1915 '
-1916 '■ fnWindScreenOpen
-1917 ''' <summary>
-1918 ''' ウィンド画面の表示、非表示設定
-1919 ''' </summary>
-1920 '''<param name="%"></param>
-1921 '''<param name="%"></param>
-1922 '''<param name="%"></param>
-1923 '''<param name="%"></param>
-1924 ''' <remarks>
-1925 ''' コメントD1001, D1002, D1003の設定
-1926 ''' MWindReSet = 0     画面非表示
-1927 ''' MWindInfoScr = 5   インフォメーション画面 D1003のみ
-1928 ''' MWindErrScr = 10    エラー画面 D1001, D1002
-1929 ''' MWindCmmnScr = 20   エラー以外のコメント画面 D1001, D1002
-1930 ''' Date   : 2021/07/07 : M.Hayakawa
-1931 ''' </remarks>
-1932 Function fnWindScreenOpen(ByVal MScreenNo,  ByVal MCommentD1001, ByVal MCommentD1002, ByVal MCommentD1003)
-1933     If MCommentD1001 <> 0 Then                    'コメント 0 は設定がないので確認
-1934         M_Out16(12480) = MCommentD1001            'D1001 コメント
-1935     EndIf
-1936     '
-1937     If MCommentD1002 <> 0 Then                    'コメント 0 は設定がないので確認
-1938         M_Out16(12496) = MCommentD1002            'D1002 コメント
-1939     EndIf
-1940     '
-1941     If MCommentD1003 <> 0 Then                    'コメント 0 は設定がないので確認
-1942        M_Out16(12512) = MCommentD1003            'D1003 コメント
-1943     EndIf
-1944     '
-1945     M_Out16(12448) = MScreenNo                '画面番号  M6448   10=エラー画面
-1946     M_Out(12363) = 1                         'ウィンド画面設定  M6362
-1947     Dly 0.5
-1948     M_Out(12363) = 0                         'ウィンド画面設定
-1949 FEnd
-1950 '
-1951 '■FnCtlValue2
-1952 ''' <summary>
-1953 ''' 投入数、組立OK数、組立NG数、吸着エラー数　Read/Write
-1954 ''' </summary>
-1955 ''' <param name="MCtlNo%"></param>
-1956 ''' <remarks>
-1957 ''' Date : 2022/04/28 渡辺
-1958 ''' </remarks>
-1959 '''
-1960 '''  1：投入数       ＋１
-1961 '''  2：組立ＯＫ数   ＋１
-1962 '''  3：組立ＮＧ数   ＋１ (未使用)
-1963 '''  4：吸着エラー数 ＋１
-1964 ''' 99：読書開始信号 OFF
-1965 '''
-1966 Function M% FnCtlValue2(ByVal MCtlNo%)
-1967     FnCtlValue2 = 1
-1968     Select MCtlNo%
-1969         Case 1        '投入数＋１
-1970             M_Out(12569) = 0             '書込み開始信号OFF
-1971             M_Out(12568) = 1             '読込み開始信号ON
-1972             MInputQty = M_In16(11600)    '投入数受信
-1973             MInputQty = MInputQty + 1    '投入数＋１
-1974             M_Out16(12592) = MInputQty   '投入数送信
-1975             M_Out(12569) = 1             '書込み開始信号ON
-1976             Break
-1977             '
-1978         Case 2        '組立ＯＫ数＋１
-1979             M_Out(12569) = 0             '書込み開始信号OFF
-1980             M_Out(12568) = 1             '読込み開始信号ON
-1981             MAssyOkQty = M_In16(11616)   '組立OK数受信
-1982             MAssyOkQty = MAssyOkQty + 1  '組立OK数＋１
-1983             M_Out16(12608) = MAssyOkQty  '組立OK数送信
-1984             M_Out(12569) = 1             '書込み開始信号ON
-1985             Break
-1986             '
-1987         Case 4        '吸着エラー数＋１
-1988             M_Out(12569) = 0                       '書込み開始信号OFF
-1989             M_Out(12568) = 1                       '読込み開始信号ON
-1990             MSuctionErrQty = M_In16(11648)         '吸着エラー数受信
-1991             MSuctionErrQty = MSuctionErrQty + 1    '吸着エラー数＋１
-1992             M_Out16(12640) = MSuctionErrQty        '吸着エラー数送信
-1993             M_Out(12569) = 1                       '書込み開始信号ON
-1994             Break
-1995             '
-1996         Case 99        '読書開始信号OFF
-1997             M_Out(12568) = 0        '読込み開始信号OFF
-1998             M_Out(12569) = 0        '書込み開始信号OFF
-1999             Break
-2000             '
-2001     End Select
-2002     Exit Function
-2003 FEnd
-2004 'Insightによる画像処理検査実行（並列処理なし）
-2005 Function M% ISInspectionSingle( ByVal PInspPos(), ByVal MInspGrNum%(), ByVal MInspCnt%, ByVal MZAxis%, ByVal MNgContinue% )
-2006 '-------------------------------------------------------------------------------
-2007 'Insightによる画像処理検査実行（並列処理なし）
-2008 '   引数
-2009 '       PInspPos()      ：検査位置
-2010 '       MInspGrNum%()   ：検査位置での検査グループ番号（=0：画像検査未実施）
-2011 '           PInspPos()、MInspGrNum%()は同じ添え字（検査Step）のものがペア
-2012 '       MInspCnt%       ：検査位置数
-2013 '       MZAxis%         ：終了時のZ軸退避座標（-1:無効）
-2014 '                           終了時にZ軸をMZAxisで設定された位置まで上昇させる
-2015 '       MNgContinue%    ：=1で検査エラー・NG発生時に全Stepの検査を行う
-2016 '   戻り値：整数
-2017 '       0=異常終了、1=正常終了
-2018 '
-2019 '   MInspErrNum     ：異常終了時にエラー番号が設定される
-2020 '   MInspNGStepNum  ：検査NG発生時の検査グループ番号が設定される
-2021 '                       複数エラー発生の場合、1回目のエラー番号、検査グループ番号を設定
-2022 '   20190820    :   引数 MZAxis%,MNgContinue 追加
-2023 '   20200410    :   検査グループ設定Retry追加
-2024 '-------------------------------------------------------------------------------
-2025     '----- 初期設定 -----
-2026     Cnt 0                                                           '移動効率化解除(初期値=0)
-2027     Fine 0.05,P                                                     '位置決め完了条件設置　0.05mm
-2028 '    Cnt 1,0.1,0.1
-2029     '変数宣言・初期化
-2030     Def Inte MNum                                                   '検査番号(検査順1～)
-2031     MNum% = 1                                                       '検査番号初期値設定
-2032     Def Inte MEndFlg                                                '検査終了フラグ
-2033     MEndFlg% = 0
-2034     '
-2035     '検査G番号設定要求・検査実行要求off
-2036     M_Out( MOUT_IS_InspGSetReq% ) = 0                               '検査G番号設定要求off
-2037     M_Out( MOUT_IS_Insp% ) = 0                                      '検査実行要求off
-2038     'エラー番号クリア
-2039     MInspErrNum = 0                                                 '検査実行エラー番号
-2040     M_Out16(MOUT_InspErrNum) = MInspErrNum
-2041     MInspNGStepNum = 0                                              '検査実行NGStep番号
-2042     M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum
-2043     '
-2044     'Insight Ready check?
-2045     If M_In(MIN_IS_Ready) = 0 Then                                  'Ready offなら終了
-2046         MInspErrNum = 20                                            '検査実行エラー番号 20 Insight offline
-2047         M_Out16(MOUT_InspErrNum) = MInspErrNum                      '検査実行エラー番号出力
-2048         M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum                '検査実行NGStep番号出力
-2049         ISInspectionSingle = 0                                      '異常終了戻り値設定
-2050         Exit Function
-2051     EndIf
-2052     '
-2053     '検査位置数確認
-2054     If MInspCnt% < 1 Or 30 < MInspCnt% Then
-2055         MInspErrNum = 21                                            '検査データなし 21　引数<1
-2056         M_Out16(MOUT_InspErrNum) = MInspErrNum                      '検査実行エラー番号出力
-2057         M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum                '検査実行NGStep番号出力
-2058         ISInspectionSingle = 0                                      '異常終了戻り値設定
-2059         Exit Function
-2060     EndIf
-2061     '
-2062     '
-2063     '
-2064     '----- メイン処理 -----
-2065     '設定された検査位置数分の検査実行
-2066     While( MEndFlg% = 0 )
-2067         '----- 検査グループ番号設定Retry追加 20200410
-2068         MSetGrNumRetryExitFlg = 0
-2069         MSetGrNumRetryCnt = 2                                           'Retry回数設定
-2070         While( MSetGrNumRetryExitFlg = 0 )
-2071         '----- 検査グループ番号設定Retry追加ここまで 20200410
-2072             '
-2073             MCurrentStepErr = 0                                         '現Step検査エラーフラグリセット
-2074             '
-2075             '----- 検査グループ番号設定 -----
-2076             M_Out16( MOUT_IS_InspGNum% ) = MInspGrNum%(MNum%)           '検査G番号設定
-2077             M_Out( MOUT_IS_InspGSetReq% ) = 1                           '検査G番号設定要求on
-2078             '
-2079             '検査位置へ移動・移動完了待ち
-2080             Mvs PInspPos( MNum% )                                       '移動
-2081             Dly 0.05                                                    '移動完了後Delay
-2082             '
-2083             '検査グループ番号設定終了確認
-2084             M_Timer(1) = 0
-2085             MExitFlg = 0
-2086             While( MExitFlg = 0 )
-2087                 '検査G設定正常終了?
-2088                 If M_In( MIN_IS_InspGSetOK% ) = 1  Then
-2089                     MExitFlg = 1
-2090                 '
-2091                 '検査G設定異常終了?
-2092                 ElseIf M_In( MIN_IS_InspGSetNG% ) = 1  Then
-2093                     MCurrentStepErr = 1                                 '現Step検査エラーフラグ
-2094                     If MInspErrNum = 0 Then                             '1回目のエラー?
-2095                         MInspErrNum = 14                                '検査G設定異常 エラー番号=14
-2096                         MInspNGStepNum = MInspGrNum%(MNum%)             'エラー検査G番号設定
-2097                     EndIf
-2098                     MExitFlg = 1
-2099                 '
-2100                 'timeoutチェック
-2101                 ElseIf 1000 < M_Timer(1) Then
-2102                     MCurrentStepErr = 1                                 '現Step検査エラーフラグ
-2103                     If MInspErrNum = 0 Then                             '1回目のエラー?
-2104                         MInspErrNum = 12                                'timeout エラー番号=12
-2105                         MInspNGStepNum = MInspGrNum%(MNum%)             'エラー検査G番号設定
-2106                     EndIf
-2107                     MExitFlg = 1
-2108                 EndIf
-2109             WEnd
-2110             '
-2111             '検査G番号設定要求off
-2112             M_Out( MOUT_IS_InspGSetReq% ) = 0                           '検査G番号設定要求off
-2113             '
-2114             '----- 検査グループ設定Retry追加 20200410
-2115             'NGなければ抜ける
-2116             If MCurrentStepErr = 0 Then
-2117                 MSetGrNumRetryExitFlg = 1
-2118             Else
-2119                 'Retry回数終了でもNG判定(OKフラグoffなら抜ける)
-2120                 If MSetGrNumRetryCnt = 0 Then
-2121                     MSetGrNumRetryExitFlg = 1
-2122                 Else
-2123                     'Retryへ　その前にDelay
-2124                     Dly 0.5
-2125                     MSetGrNumRetryCnt = MSetGrNumRetryCnt - 1       'RetryCnt-1
-2126                 EndIf
-2127             EndIf
-2128             '----- 検査グループ設定Retry追加ここまで 20200410
-2129             '
-2130         WEnd
-2131         '
-2132         '
-2133         '
-2134         '----- 検査実行 -----
-2135         If MCurrentStepErr = 0  Then                                '検査G番号設定NGの場合は検査実行しない
-2136             If 0 < MInspGrNum%(MNum%) Then                          '検査あり?
-2137                 MJudgeOKFlg = 0                                     '検査OKフラグクリア
-2138                 MInspRetryExitFlg = 0
-2139                 MRetryCnt = 2                                        'Retry回数設定
-2140                 While( MInspRetryExitFlg = 0 )
-2141                     M_Out( MOUT_IS_Insp% ) = 1                      '検査実行要求on
-2142                     '
-2143                     '検査完了確認
-2144                     MRetryCnt = MRetryCnt - 1
-2145                     M_Timer(1) = 0
-2146                     MExitFlg = 0
-2147                     While( MExitFlg = 0 )
-2148                     '検査完了待ち
-2149                         '検査OK終了?
-2150                         If M_In( MIN_IS_InspOK% ) = 1  Then
-2151                             MJudgeOKFlg = 1                         '検査OKフラグON
-2152                             MExitFlg = 1
-2153                         '
-2154                         '検査NG終了?
-2155                         ElseIf M_In( MIN_IS_InspNG% ) = 1  Then
-2156                             If MInspErrNum = 0 Then                 '1回目のエラー?
-2157                                 If MRetryCnt = 0 Then               'RetryしてもNGならNGとする
-2158                                     MInspErrNum = 32                    '検査NG エラー番号=32
-2159                                     MInspNGStepNum = MInspGrNum%(MNum%) 'エラー検査G番号設定
-2160                                 EndIf
-2161                             EndIf
-2162                             MExitFlg = 1
-2163                         '
-2164                         '検査異常終了(IS timeout)?
-2165                         ElseIf M_In( MIN_IS_InspErr% ) = 1  Then
-2166                             If MInspErrNum = 0 Then                 '1回目のエラー?
-2167                                 If MRetryCnt = 0 Then               'RetryしてもNGならNGとする
-2168                                     MInspErrNum = 38                    '検査異常終了 エラー番号=38
-2169                                     MInspNGStepNum = MInspGrNum%(MNum%) 'エラー検査G番号設定
-2170                                 EndIf
-2171                             EndIf
-2172                             MExitFlg = 1
-2173                         '
-2174                         'timeoutチェック
-2175                         ElseIf 3000 < M_Timer(1) Then
-2176                             If MInspErrNum = 0 Then                 '1回目のエラー?
-2177                                 If MRetryCnt = 0 Then               'RetryしてもNGならNGとする
-2178                                     MInspErrNum = 34                    '検査異常終了 エラー番号=34
-2179                                     MInspNGStepNum = MInspGrNum%(MNum%) 'エラー検査G番号設定
-2180                                 EndIf
-2181                             EndIf
-2182                             MExitFlg = 1
-2183                         EndIf
-2184                     WEnd
-2185                     '
-2186                     '検査開始要求off
-2187                     M_Out(MOUT_IS_Insp%) = 0                        '検査実行要求off
-2188                     '
-2189                     'OKなら抜ける
-2190                     If MJudgeOKFlg = 1 Then
-2191                         MInspRetryExitFlg = 1
-2192                     Else
-2193                         'Retry回数終了でもNG判定(OKフラグoffなら抜ける)
-2194                         If MRetryCnt = 0 Then
-2195                             MInspRetryExitFlg = 1
-2196                         Else
-2197                             'Retryへ　その前にDelay
-2198                             Dly 0.3
-2199                         EndIf
-2200                     EndIf
-2201                     '
-2202                 WEnd
-2203             EndIf
-2204         EndIf
-2205         '
-2206         '
-2207         '
-2208         MNum% = MNum% + 1                                           '検査Step+1
-2209         '検査終了確認　検査終了フラグセット
-2210         If (MInspCnt% < MNum% ) Then
-2211             MEndFlg% = 1                                            '検査終了フラグセット
-2212         EndIf
-2213         'NG発生時続行時処理
-2214         If MInspErrNum <> 0 Then                                    'NGあり?
-2215             If MNgContinue% <> 1 Then                               'NG続行?
-2216                 MEndFlg% = 1                                        '検査終了フラグセット
-2217             EndIf
-2218         EndIf
-2219     WEnd
-2220     '
-2221     '終了時にZ軸をMZAxisで設定された位置まで上昇させる
-2222     If 0 < MZAxis% Then
-2223         PCurrentPos = P_Curr                                        '現在位置取得
-2224         PCurrentPos.Z = MZAxis%                                     'Z軸を設定
-2225         Mvs PCurrentPos                                             '現在位置上空へ移動
-2226     EndIf
-2227     Fine 0 , P
-2228     '
-2229     '戻り値設定
-2230     If MInspErrNum = 0 Or M_In(11372) = 1 Then                      'カメラ検査強制OK(M_In(11372)=1)追加(12/21中村)
-2231         ISInspectionSingle = 1                                      '正常終了戻り値設定
-2232     Else
-2233         M_Out16(MOUT_InspErrNum) = MInspErrNum                      '検査実行エラー番号出力
-2234         M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum                '検査実行NGStep番号出力
-2235         ISInspectionSingle = 0                                      '異常終了戻り値設定
-2236     EndIf
-2237     '
-2238 FEnd
-2239 '
-2240 ' ■ISInspection
-2241 ''' <summary>
-2242 ''' Insightによる画像処理検査実行
-2243 ''' </summary>
-2244 '''<param name="PInspPos()">検査位置</param>
-2245 '''<param name="MInspGrNum%()">検査位置での検査グループ番号（=0：画像検査未実施）</param>
-2246 '''             PInspPos()、MInspGrNum%()は同じ添え字（検査Step）のものがペア
-2247 '''<param name="MInspCnt%">検査位置数</param>
-2248 '''<param name="MZAxis%">終了時のZ軸退避座標（-1:無効）</param>
-2249 '''             終了時にZ軸をMZAxisで設定された位置まで上昇させる
-2250 '''<param name="MNgContinue%">=1で検査エラー・NG発生時に全Stepの検査を行う</param>
-2251 '''<returns>    整数 0=異常終了、1=正常終了</returns>
-2252 '''         MInspErrNum     ：異常終了時にエラー番号が設定される
-2253 '''         MInspNGStepNum  ：検査NG発生時の検査グループ番号が設定される"
-2254 ''' <remarks>
-2255 ''' Date   : 2021/07/07 : M.Hayakawa
-2256 ''' </remarks>
-2257 'Function M% ISInspection( ByVal PInspPos(), ByVal MInspGrNum%(), ByVal MInspCnt%, ByVal MZAxis%, ByVal MNgContinue% )
-2258 '    '画像使用確認 0<- 画像確認無しの場合
-2259 '    If M_In(11369) = 0 Then            'toRBT_使用確認
-2260 '        ISInspection = 1                                        '正常終了戻り値設定
-2261 '    EndIf
-2262 ''
-2263 '    Cnt 0                                                       '移動効率化解除(初期値=0)
-2264 '    Fine 0.05,P                                                 '位置決め完了条件設置　0.05mm
-2265 '    MNum% = 1                                                   '検査番号初期値設定
-2266 '    Def Inte MEndFlg                                            '検査終了フラグ
-2267 '    MEndFlg% = 0
-2268 '    '
-2269 '    'エラー番号クリア
-2270 '    MInspErrNumSub = 0                                          '検査実行エラー番号sub
-2271 '    MInspErrNum = 0                                             '検査実行エラー番号
-2272 '    M_Out16(MOUT_InspErrNum) = MInspErrNum
-2273 '    MInspNGStepNum = 0                                          '検査実行NGStep番号
-2274 '    M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum
-2275 '    '
-2276 '    If M_In(MIN_IS_Ready) = 0 Then                              'Ready offなら終了
-2277 '        MInspErrNum = 20                                        '検査実行エラー番号 20 Insight offline
-2278 '        M_Out16(MOUT_InspErrNum) = MInspErrNum                  '検査実行エラー番号出力
-2279 '        M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum            '検査実行NGStep番号出力
-2280 '        ISInspection = 0                                        '異常終了戻り値設定
-2281 ''
-2282 '    EndIf
-2283 '   If M_In(MIN_IS_Ready) = 0 Then *ISInspection_End
-2284 '    '
-2285 '    '検査位置数確認
-2286 '    If MInspCnt% < 1 Or 30 < MInspCnt% Then
-2287 '        MInspErrNum = 21                                        '検査データなし 21　引数<1
-2288 '        M_Out16(MOUT_InspErrNum) = MInspErrNum                  '検査実行エラー番号出力
-2289 '        M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum            '検査実行NGStep番号出力
-2290 '        ISInspection = 0                                        '異常終了戻り値設定
-2291 ''
-2292 '    EndIf
-2293 '   If MInspCnt% < 1 Or 30 < MInspCnt% Then *ISInspection_End
-2294 '    '
-2295 '    '設定された検査位置数分の検査実行
-2296 '    While( MEndFlg% = 0 )
-2297 '        '検査終了確認　検査終了フラグセット
-2298 '        If (MInspCnt% < MNum% ) Then
-2299 '            MEndFlg% = 1                                        '検査終了フラグセット
-2300 '        EndIf
-2301 '        '
-2302 '        'タスク　検査G番号設定・検査完了確認処理開始　INSPTAST1
-2303 '        If MEndFlg% = 0 Then
-2304 '            M_01# = MInspGrNum%(MNum%)                          '検査G番号引渡し
-2305 '        EndIf
-2306 '        M_02# = MEndFlg%                                        '検査終了フラグ引渡し
-2307 '        M_05# = MNum%                                           '検査番号(検査順1～)
-2308 '        'タスク　検査G設定フラグ引渡し
-2309 '        If MEndFlg% = 0 Then
-2310 '            If 0 < MInspGrNum%(MNum%) Then
-2311 '                M_03# = 1
-2312 '            Else
-2313 '                M_03# = 0
-2314 '            EndIf
-2315 '        Else
-2316 '            M_03# = 0
-2317 '        EndIf
-2318 '        'タスク　検査結果確認フラグ引渡し
-2319 '        If 1 < MNum% Then
-2320 '            If 0 < MInspGrNum%(MNum%-1) Then
-2321 '                M_04# = 1
-2322 '            Else
-2323 '                M_04# = 0
-2324 '            EndIf
-2325 '        Else
-2326 '            M_04# = 0
-2327 '        EndIf
-2328 '        '
-2329 '        'タスク処理開始
-2330 '        M_00# = 1                                               'TASK処理開始
-2331 '        'タスク処理開始確認
-2332 '        M_Timer(1) = 0
-2333 '        MExitFlg = 0
-2334 '        While( MExitFlg = 0 )
-2335 '            '処理開始完了確認
-2336 '            If M_00# = 0 And M_10# = 8 Then
-2337 '                MExitFlg = 1
-2338 '            EndIf
-2339 '            'timeoutチェック
-2340 '            If 2000 < M_Timer(1) Then
-2341 '                If MNgContinue% = 1 Then                        'NG続行?
-2342 '                    MInspErrNumSub = 36                         'エラー番号設定36
-2343 '                Else
-2344 '                    MInspErrNum = 36                            'エラー番号設定36
-2345 '                EndIf
-2346 '                MExitFlg = 1
-2347 '            EndIf
-2348 '        WEnd
-2349 '        '
-2350 '        '検査位置へ移動・移動完了待ち
-2351 '        If 0 = MInspErrNum Then
-2352 '            If MEndFlg% = 0 Then
-2353 '                Mvs PInspPos( MNum% )                           '移動
-2354 '            EndIf
-2355 '        EndIf
-2356 '        '
-2357 '        'タスク　検査G番号設定・検査完了確認処理終了待ち　INSPTAST1
-2358 '        If 0 = MInspErrNum Then
-2359 '            M_Timer(1) = 0
-2360 '            MExitFlg = 0
-2361 '            While( MExitFlg = 0 )
-2362 '                '処理完了待ち（正常終了）
-2363 '                If M_10# = 1 Then
-2364 '                    MExitFlg = 1
-2365 '                EndIf
-2366 '                '処理完了待ち（異常終了）
-2367 '                If M_10# = 0 Then
-2368 '                    If MNgContinue% = 1 Then                    'NG続行?
-2369 '                        MInspErrNumSub = M_12#                  'エラー番号設定　M12
-2370 '                    Else
-2371 '                        MInspErrNum = M_12#                     'エラー番号設定　M12
-2372 '                    EndIf
-2373 '                    MExitFlg = 1
-2374 '                EndIf
-2375 '                'timeoutチェック
-2376 '                If 5000 < M_Timer(1) Then
-2377 '                    If MNgContinue% = 1 Then                    'NG続行?
-2378 '                        MInspErrNumSub = 31                     'エラー番号設定31
-2379 '                    Else
-2380 '                        MInspErrNum = 31                        'エラー番号設定31
-2381 '                    EndIf
-2382 '                    MExitFlg = 1
-2383 '                EndIf
-2384 '            WEnd
+1704 FEnd
+1705 '
+1706 '■ScrewGet_S3
+1707 ''' <summary>
+1708 ''' ねじ供給機からねじを得る
+1709 ''' </summary>
+1710 '''<param name="%"></param>
+1711 '''         PScrewPos(1)    ：ねじ供給器のねじ上空
+1712 '''         PScrewPos(2)    ：ねじ供給器回避点
+1713 '''         PScrewPos(10)   ：ねじ供給器のねじピックアップ位置：ねじ頭とビットとのクリアランスは0.3mmが理想
+1714 '''         PScrewPos(3)    ：Mねじポカヨケ位置
+1715 '''         PScrewPos(4)    ：Mねじポカヨケ位置　上空
+1716 '''<returns>整数
+1717 '''         0=異常終了、1=正常終了、-1=MネジセンサーNG、-2=MネジセンサーON、-3=吸着エラー
+1718 '''</returns>
+1719 ''' <remarks>
+1720 ''' Date   : 2021/07/07 : M.Hayakawa
+1721 ''' </remarks>'
+1722 Function M% ScrewGet_S3(ByVal PScrewPosition())
+1723     ScrewGet_S3 = 0
+1724     MMScrewJudge% = 0
+1725     'ねじ供給器初期動作エラーチェック
+1726 ' ↓暫定削除
+1727 '    Wait M_In(X34_ScrewReady1)=1 'ねじ供給器SがReadyになるまで待つ　←　何秒か待ってReadyにならなければ抜けるプログラムが必要？
+1728 '    Ovrd 100
+1729 '    If M_In(X33_SS2)=0 Then  'Mねじ検出センサがOFF（故障）していた場合
+1730 '        Ovrd 30
+1731 '        Mvs,-80             'その場所から80mm上空へ移動
+1732 '        Mov PInitPos19049   '19049初期位置へ移動
+1733 '        M_Out(Y6A_VV1)=0    'ねじ吸着 Off
+1734 '        'NGとしてここの関数から抜ける
+1735 '        ScrewGet_S3 = -1
+1736 '        MMScrewJudge% = 1
+1737 '        MCommentD1001 = 61
+1738 '    EndIf
+1739 '    If ScrewGet_S3 = 0 Then
+1740 '        'Sタイト用ねじ供給機にMねじが混入していないか監視
+1741 '        MMScrewJudge% = 0 'MMScrewJudgeを初期化する
+1742 '        MRtn = frInCheck(X32_SS1, 0, MSETTIMEOUT01&)
+1743 '        If MRtn = 0 Then
+1744 '            Ovrd 30
+1745 '            Mvs,-80            'その場所から50mm上空へ移動
+1746 '            Mov PInitPos19049  '19049初期位置へ移動
+1747 '            MMScrewJudge% = 2
+1748 '            MRtn = All_CLamp_Release()'全てのクランプ解除へ分岐
+1749 '            MCnt% = 2   '2を設定
+1750 '            MCommentD1001 = 62
+1751 '        EndIf
+1752 '        If MMScrewJudge% = 2 Then
+1753 '            ScrewGet_S3 = -2
+1754 '        EndIf
+1755 '    EndIf
+1756 '    'Mネジ判定がONの場合 NGとして関数を抜ける
+1757 '    If MMScrewJudge% = 2 Then
+1758 '        ScrewGet_S3 = -2
+1759 '    EndIf
+1760     'Sネジ用ねじ太郎のMネジ混入確認用ここまで
+1761     Ovrd 100
+1762     Spd M_NSpd
+1763     If MMScrewJudge% = 0 Then
+1764         ScrewGet_S3 = 0
+1765         M_Out(Y63_Driver)=1         ' バンクセッティング　C2
+1766         MScrewCnt% = 0
+1767         MFinCnt% = 2
+1768 '        For MCnt% = 0 To MFinCnt%
+1769             Mov PScrewPosition(2)        ' ねじ供給機回避点
+1770             Mov PScrewPosition(1)        ' ねじ供給機(Sネジ）上空
+1771             Ovrd 80
+1772             'ねじっこ(Sネジ）ねじピックアップ位置：ねじ頭とビットとのクリアランスは0.3mmが理想
+1773             'ネジとビット篏合させる 吸着位置から1.2下げて篏合
+1774             Mvs PScrewPosition(10), 1.2
+1775             M_Out(Y6A_VV1)=1        ' ねじ吸着　ON
+1776             'ビット回転
+1777             M_Out(Y60_Driver)=1
+1778             Dly 0.2
+1779             '
+1780             Ovrd 100
+1781             JOvrd M_NJovrd
+1782             Spd M_NSpd
+1783             'ネジ吸着確認位置移動
+1784             Mvs PScrewPosition(10)       ' 念のため一旦、旧ねじ吸着位置
+1785             Mvs PScrewPosition(10), -15  ' ネジ吸着確認位置
+1786             'ビット回転停止
+1787             'M_Out(Y60_Driver)=0
+1788             '
+1789             '1秒間ネジ吸着確認
+1790 ' 以下暫定削除
+1791 '            MRtn = frInCheck(X2B_VS1, 1, MSETTIMEOUT01&)
+1792 '            'MRtn = 0'強制エラー
+1793 '            '吸着エラーの場合
+1794 '            'ネジをねじ太郎に戻す
+1795 '            If MRtn = 0 Then
+1796 '                Ovrd 30
+1797 '                'ビット回転停止
+1798 '                M_Out(Y60_Driver)=0
+1799 '                'ネジ供給機上空
+1800 '                Mvs PScrewPos(1)
+1801 '                '更に上空
+1802 '                Mov PScrewPos(1), -75
+1803 '                'ネジ捨て位置
+1804 '                Mov PScrewFeedS021
+1805 '                '吸着OFF
+1806 '                M_Out(Y6A_VV1)=0 'ねじ吸着　OFF
+1807 '                Dly 0.2
+1808 '                '破壊ON
+1809 '                M_Out(Y6B_VB1)=1 '真空破壊ON
+1810 '                'ビット回転
+1811 '                M_Out(Y61_Driver)=1
+1812 '                Dly 0.5
+1813 '                '
+1814 '                Ovrd 100
+1815 '                JOvrd M_NJovrd
+1816 '                Spd M_NSpd
+1817 '                'ドライバーを上下させねじを振り落とす
+1818 '                Mov PScrewFeedS021, 10
+1819 '                Mov PScrewFeedS021
+1820 '                Dly 0.1
+1821 '                Mov PScrewFeedS021, 10
+1822 '                Mov PScrewFeedS021
+1823 '                '
+1824 '                'ネジ落ち待ち
+1825 '                'ビット回転停止
+1826 '                M_Out(Y61_Driver)=0
+1827 '                Dly 0.1
+1828 '                '破壊OFF
+1829 '                M_Out(Y6B_VB1)=0 '真空破壊OFF
+1830 '                '
+1831 '                '
+1832 '                'ねじ落ちたとして、移動更に上空
+1833 '                Mov PScrewPos(1), -75
+1834 '                Ovrd 100
+1835 '                Spd M_NSpd
+1836 '                'ネジ供給機上空
+1837 '                Mvs PScrewPos(1)
+1838 '                '
+1839 '                ScrewGet_S3 = -3
+1840 '                Break
+1841 '                '
+1842 '            Else
+1843 '                MCnt% = MFinCnt%
+1844 '                ScrewGet_S3 = 0
+1845 '            EndIf
+1846 '        Next  MCnt%
+1847         '
+1848         Ovrd 100
+1849         Spd M_NSpd
+1850         Mvs PScrewPosition(10), -15  ' ねじピックアップ位置 -15mm
+1851         M_Out(Y60_Driver)=0     ' ビット回転停止
+1852         M_Out(Y63_Driver)=0     ' バンクセッティング　C2
+1853         Mvs PScrewPosition(10), -15  ' ねじピックアップ位置 -15mm
+1854         'もう一度吸着確認
+1855 ' 以下暫定削除
+1856 '        MRtn = frInCheck(X2B_VS1, 1, MSETTIMEOUT01&)
+1857 '        If MRtn = 0 Then      '吸着エラーの場合
+1858 '            MCommentD1001 = 94
+1859 '            MCommentD1002 = 95
+1860 '            ScrewGet_S3 = -3
+1861 '        EndIf
+1862 '        If MRtn = 1 Then      '吸着OKの場合
+1863 '            ScrewGet_S3 = 1
+1864 '        EndIf
+1865 '        Break
+1866     Else
+1867         'Mネジ
+1868         If MMScrewJudge% = 2 Then
+1869             ScrewGet_S3 = -2
+1870         EndIf
+1871     EndIf
+1872 FEnd
+1873 '
+1874 '■fnKEY_WAIT()
+1875 ''' <summary>
+1876 ''' GOTからのキー入力待ち
+1877 ''' </summary>
+1878 '''<returns>1：停止    2：次へ
+1879 '''         3：継続    4：トルクチェック開始
+1880 '''         5：NG
+1881 '''         11：ロボット初期位置1    12：ロボット初期位置2
+1882 '''         13：ロボット初期位置3    14：ロボット初期位置4
+1883 '''</returns>
+1884 ''' <remarks>
+1885 ''' Date   : 2021/07/07 : M.Hayakawa
+1886 ''' </remarks>'
+1887 Function M% fnKEY_WAIT()
+1888     fnKEY_WAIT = 0
+1889     M_Out(MOUT_GREEN_LIGHT%) = 0        'PATLIGHT 青点灯
+1890     M_Out(MOUT_RED_FLASH%) = 1          'PATLIGHT 赤点滅
+1891     MRtn = fnAUTO_CTL()                        'AUTOモード停止、継続キー入力待ち
+1892     '下記キー待ちの継続に反応させないため
+1893     Wait M_In(11347) = 0                'toRBT_継続の完了待ち
+1894     Dly 0.2
+1895     Wait M_In(11347) = 0                'toRBT_継続の完了待ち　2重確認
+1896     MLocalLoopFlg=1
+1897     While MLocalLoopFlg=1
+1898         If M_In(11345) = 1 Then         '停止   M5345
+1899             M_Out(12343) = 1 Dly 0.5    '停止要求受信パルス M6343
+1900             fnKEY_WAIT = 1
+1901             MLocalLoopFlg=-1
+1902             Break
+1903         ElseIf M_In(11346) = 1 Then     'fromPLC_次へ   M5346
+1904             M_Out(12348) = 1 Dly 1.0    '次へ要求受信パルス M6348
+1905             fnKEY_WAIT = 2
+1906             MLocalLoopFlg=-1
+1907             Break
+1908         ElseIf M_In(11356) = 1 Then     'fromPLC_継続2  M5356
+1909             M_Out(12344) = 1 Dly 1.0    'toPLC_RBT継続2要求受信 M6344
+1910             fnKEY_WAIT = 3
+1911             MLocalLoopFlg=-1
+1912             Break
+1913         ElseIf M_In(11355) = 1 Then     'fromPLC_トルクチェック開始要求
+1914             M_Out(12342) = 1 Dly 0.5    'toPLC_RBTトルクチェック開始要求受信パルス M6342
+1915             fnKEY_WAIT = 4
+1916             MLocalLoopFlg=-1
+1917             Break
+1918         ElseIf M_In(11357) = 1 Then     'fromPLC_NG要求
+1919             M_Out(12349) = 1 Dly 1.0    'toPLC_NG受信パルス M6349
+1920             fnKEY_WAIT = 5
+1921             MLocalLoopFlg=-1
+1922             Break
+1923             '
+1924         ElseIf M_In(MIN_INIT1REQUEST%) = 1 Then     'toRBT_ロボット初期位置1要求 M5568
+1925             M_Out(MOUT_INIT1RECIVE%) = 1 Dly 1.0    'toPLC_ロボット初期位置1受信 M6560
+1926             fnKEY_WAIT = MRobotInit1%
+1927             MLocalLoopFlg=-1
+1928             Break
+1929             '
+1930         ElseIf M_In(MIN_INIT2REQUEST%) = 1 Then     'toRBT_ロボット初期位置2要求 M5569
+1931             M_Out(MOUT_INIT2RECIVE%) = 1 Dly 0.1    'toPLC_ロボット初期位置2受信 M6561
+1932             fnKEY_WAIT = MRobotInit2%
+1933             MLocalLoopFlg=-1
+1934             Break
+1935             '
+1936         ElseIf M_In(MIN_INIT3REQUEST%) = 1 Then     'toRBT_ロボット初期位置3要求 M5570
+1937             M_Out(MOUT_INIT3RECIVE%) = 1 Dly 1.0    'toPLC_ロボット初期位置3受信 M6562
+1938             fnKEY_WAIT = MRobotInit3%
+1939             MLocalLoopFlg=-1
+1940             Break
+1941             '
+1942         ElseIf M_In(MIN_INIT4REQUEST%) = 1 Then     'toRBT_ロボット初期位置4要求 M5571
+1943             M_Out(MOUT_INIT4RECIVE%) = 1 Dly 1.0    'toPLC_ロボット初期位置4受信 M6563
+1944             fnKEY_WAIT = MRobotInit4%
+1945             MLocalLoopFlg=-1
+1946             Break
+1947             '
+1948         Else
+1949         EndIf
+1950     WEnd
+1951     M_Out(MOUT_GREEN_LIGHT%) = 1                    'PATLIGHT 青点灯
+1952     M_Out(MOUT_RED_FLASH%) = 0                      'PATLIGHT 赤点滅
+1953 FEnd
+1954 '
+1955 '■ fnAUTO_CTL
+1956 ''' <summary>
+1957 ''' AUTOモードOFF、PLCからの開始待ち
+1958 ''' </summary>
+1959 ''' <remarks>
+1960 ''' Date   : 2021/07/07 : M.Hayakawa
+1961 ''' </remarks>
+1962 Function M% fnAUTO_CTL
+1963     fnAUTO_CTL = 0
+1964     M_Out(12355) = 1            'toPLC_AUTO_MODE_OFF M6355
+1965     Wait M_In(11347) = 1        'toRBT_継続　の指示待ち  M5347
+1966     M_Out(12355) = 0            'toPLC_AUTO_MODE_OFF M6355
+1967     '
+1968     If M_Svo=0 Then             'サーボON確認
+1969         Servo On
+1970     EndIf
+1971     Wait M_Svo=1
+1972 FEnd
+1973 '
+1974 '■ fnWindScreenOpen
+1975 ''' <summary>
+1976 ''' ウィンド画面の表示、非表示設定
+1977 ''' </summary>
+1978 '''<param name="%"></param>
+1979 '''<param name="%"></param>
+1980 '''<param name="%"></param>
+1981 '''<param name="%"></param>
+1982 ''' <remarks>
+1983 ''' コメントD1001, D1002, D1003の設定
+1984 ''' MWindReSet = 0     画面非表示
+1985 ''' MWindInfoScr = 5   インフォメーション画面 D1003のみ
+1986 ''' MWindErrScr = 10    エラー画面 D1001, D1002
+1987 ''' MWindCmmnScr = 20   エラー以外のコメント画面 D1001, D1002
+1988 ''' Date   : 2021/07/07 : M.Hayakawa
+1989 ''' </remarks>
+1990 Function fnWindScreenOpen(ByVal MScreenNo,  ByVal MCommentD1001, ByVal MCommentD1002, ByVal MCommentD1003)
+1991     If MCommentD1001 <> 0 Then                    'コメント 0 は設定がないので確認
+1992         M_Out16(12480) = MCommentD1001            'D1001 コメント
+1993     EndIf
+1994     '
+1995     If MCommentD1002 <> 0 Then                    'コメント 0 は設定がないので確認
+1996         M_Out16(12496) = MCommentD1002            'D1002 コメント
+1997     EndIf
+1998     '
+1999     If MCommentD1003 <> 0 Then                    'コメント 0 は設定がないので確認
+2000        M_Out16(12512) = MCommentD1003            'D1003 コメント
+2001     EndIf
+2002     '
+2003     M_Out16(12448) = MScreenNo                '画面番号  M6448   10=エラー画面
+2004     M_Out(12363) = 1                         'ウィンド画面設定  M6362
+2005     Dly 0.5
+2006     M_Out(12363) = 0                         'ウィンド画面設定
+2007 FEnd
+2008 '
+2009 '■FnCtlValue2
+2010 ''' <summary>
+2011 ''' 投入数、組立OK数、組立NG数、吸着エラー数　Read/Write
+2012 ''' </summary>
+2013 ''' <param name="MCtlNo%"></param>
+2014 ''' <remarks>
+2015 ''' Date : 2022/04/28 渡辺
+2016 ''' </remarks>
+2017 '''
+2018 '''  1：投入数       ＋１
+2019 '''  2：組立ＯＫ数   ＋１
+2020 '''  3：組立ＮＧ数   ＋１ (未使用)
+2021 '''  4：吸着エラー数 ＋１
+2022 ''' 99：読書開始信号 OFF
+2023 '''
+2024 Function M% FnCtlValue2(ByVal MCtlNo%)
+2025     FnCtlValue2 = 1
+2026     Select MCtlNo%
+2027         Case 1        '投入数＋１
+2028             M_Out(12569) = 0             '書込み開始信号OFF
+2029             M_Out(12568) = 1             '読込み開始信号ON
+2030             MInputQty = M_In16(11600)    '投入数受信
+2031             MInputQty = MInputQty + 1    '投入数＋１
+2032             M_Out16(12592) = MInputQty   '投入数送信
+2033             M_Out(12569) = 1             '書込み開始信号ON
+2034             Break
+2035             '
+2036         Case 2        '組立ＯＫ数＋１
+2037             M_Out(12569) = 0             '書込み開始信号OFF
+2038             M_Out(12568) = 1             '読込み開始信号ON
+2039             MAssyOkQty = M_In16(11616)   '組立OK数受信
+2040             MAssyOkQty = MAssyOkQty + 1  '組立OK数＋１
+2041             M_Out16(12608) = MAssyOkQty  '組立OK数送信
+2042             M_Out(12569) = 1             '書込み開始信号ON
+2043             Break
+2044             '
+2045         Case 4        '吸着エラー数＋１
+2046             M_Out(12569) = 0                       '書込み開始信号OFF
+2047             M_Out(12568) = 1                       '読込み開始信号ON
+2048             MSuctionErrQty = M_In16(11648)         '吸着エラー数受信
+2049             MSuctionErrQty = MSuctionErrQty + 1    '吸着エラー数＋１
+2050             M_Out16(12640) = MSuctionErrQty        '吸着エラー数送信
+2051             M_Out(12569) = 1                       '書込み開始信号ON
+2052             Break
+2053             '
+2054         Case 99        '読書開始信号OFF
+2055             M_Out(12568) = 0        '読込み開始信号OFF
+2056             M_Out(12569) = 0        '書込み開始信号OFF
+2057             Break
+2058             '
+2059     End Select
+2060     Exit Function
+2061 FEnd
+2062 'Insightによる画像処理検査実行（並列処理なし）
+2063 Function M% ISInspectionSingle( ByVal PInspPos(), ByVal MInspGrNum%(), ByVal MInspCnt%, ByVal MZAxis%, ByVal MNgContinue% )
+2064 '-------------------------------------------------------------------------------
+2065 'Insightによる画像処理検査実行（並列処理なし）
+2066 '   引数
+2067 '       PInspPos()      ：検査位置
+2068 '       MInspGrNum%()   ：検査位置での検査グループ番号（=0：画像検査未実施）
+2069 '           PInspPos()、MInspGrNum%()は同じ添え字（検査Step）のものがペア
+2070 '       MInspCnt%       ：検査位置数
+2071 '       MZAxis%         ：終了時のZ軸退避座標（-1:無効）
+2072 '                           終了時にZ軸をMZAxisで設定された位置まで上昇させる
+2073 '       MNgContinue%    ：=1で検査エラー・NG発生時に全Stepの検査を行う
+2074 '   戻り値：整数
+2075 '       0=異常終了、1=正常終了
+2076 '
+2077 '   MInspErrNum     ：異常終了時にエラー番号が設定される
+2078 '   MInspNGStepNum  ：検査NG発生時の検査グループ番号が設定される
+2079 '                       複数エラー発生の場合、1回目のエラー番号、検査グループ番号を設定
+2080 '   20190820    :   引数 MZAxis%,MNgContinue 追加
+2081 '   20200410    :   検査グループ設定Retry追加
+2082 '-------------------------------------------------------------------------------
+2083     '----- 初期設定 -----
+2084     Cnt 0                                                           '移動効率化解除(初期値=0)
+2085     Fine 0.05,P                                                     '位置決め完了条件設置　0.05mm
+2086 '    Cnt 1,0.1,0.1
+2087     '変数宣言・初期化
+2088     Def Inte MNum                                                   '検査番号(検査順1～)
+2089     MNum% = 1                                                       '検査番号初期値設定
+2090     Def Inte MEndFlg                                                '検査終了フラグ
+2091     MEndFlg% = 0
+2092     '
+2093     '検査G番号設定要求・検査実行要求off
+2094     M_Out( MOUT_IS_InspGSetReq% ) = 0                               '検査G番号設定要求off
+2095     M_Out( MOUT_IS_Insp% ) = 0                                      '検査実行要求off
+2096     'エラー番号クリア
+2097     MInspErrNum = 0                                                 '検査実行エラー番号
+2098     M_Out16(MOUT_InspErrNum) = MInspErrNum
+2099     MInspNGStepNum = 0                                              '検査実行NGStep番号
+2100     M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum
+2101     '
+2102     'Insight Ready check?
+2103     If M_In(MIN_IS_Ready) = 0 Then                                  'Ready offなら終了
+2104         MInspErrNum = 20                                            '検査実行エラー番号 20 Insight offline
+2105         M_Out16(MOUT_InspErrNum) = MInspErrNum                      '検査実行エラー番号出力
+2106         M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum                '検査実行NGStep番号出力
+2107         ISInspectionSingle = 0                                      '異常終了戻り値設定
+2108         Exit Function
+2109     EndIf
+2110     '
+2111     '検査位置数確認
+2112     If MInspCnt% < 1 Or 30 < MInspCnt% Then
+2113         MInspErrNum = 21                                            '検査データなし 21　引数<1
+2114         M_Out16(MOUT_InspErrNum) = MInspErrNum                      '検査実行エラー番号出力
+2115         M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum                '検査実行NGStep番号出力
+2116         ISInspectionSingle = 0                                      '異常終了戻り値設定
+2117         Exit Function
+2118     EndIf
+2119     '
+2120     '
+2121     '
+2122     '----- メイン処理 -----
+2123     '設定された検査位置数分の検査実行
+2124     While( MEndFlg% = 0 )
+2125         '----- 検査グループ番号設定Retry追加 20200410
+2126         MSetGrNumRetryExitFlg = 0
+2127         MSetGrNumRetryCnt = 2                                           'Retry回数設定
+2128         While( MSetGrNumRetryExitFlg = 0 )
+2129         '----- 検査グループ番号設定Retry追加ここまで 20200410
+2130             '
+2131             MCurrentStepErr = 0                                         '現Step検査エラーフラグリセット
+2132             '
+2133             '----- 検査グループ番号設定 -----
+2134             M_Out16( MOUT_IS_InspGNum% ) = MInspGrNum%(MNum%)           '検査G番号設定
+2135             M_Out( MOUT_IS_InspGSetReq% ) = 1                           '検査G番号設定要求on
+2136             '
+2137             '検査位置へ移動・移動完了待ち
+2138             Mvs PInspPos( MNum% )                                       '移動
+2139             Dly 0.05                                                    '移動完了後Delay
+2140             '
+2141             '検査グループ番号設定終了確認
+2142             M_Timer(1) = 0
+2143             MExitFlg = 0
+2144             While( MExitFlg = 0 )
+2145                 '検査G設定正常終了?
+2146                 If M_In( MIN_IS_InspGSetOK% ) = 1  Then
+2147                     MExitFlg = 1
+2148                 '
+2149                 '検査G設定異常終了?
+2150                 ElseIf M_In( MIN_IS_InspGSetNG% ) = 1  Then
+2151                     MCurrentStepErr = 1                                 '現Step検査エラーフラグ
+2152                     If MInspErrNum = 0 Then                             '1回目のエラー?
+2153                         MInspErrNum = 14                                '検査G設定異常 エラー番号=14
+2154                         MInspNGStepNum = MInspGrNum%(MNum%)             'エラー検査G番号設定
+2155                     EndIf
+2156                     MExitFlg = 1
+2157                 '
+2158                 'timeoutチェック
+2159                 ElseIf 1000 < M_Timer(1) Then
+2160                     MCurrentStepErr = 1                                 '現Step検査エラーフラグ
+2161                     If MInspErrNum = 0 Then                             '1回目のエラー?
+2162                         MInspErrNum = 12                                'timeout エラー番号=12
+2163                         MInspNGStepNum = MInspGrNum%(MNum%)             'エラー検査G番号設定
+2164                     EndIf
+2165                     MExitFlg = 1
+2166                 EndIf
+2167             WEnd
+2168             '
+2169             '検査G番号設定要求off
+2170             M_Out( MOUT_IS_InspGSetReq% ) = 0                           '検査G番号設定要求off
+2171             '
+2172             '----- 検査グループ設定Retry追加 20200410
+2173             'NGなければ抜ける
+2174             If MCurrentStepErr = 0 Then
+2175                 MSetGrNumRetryExitFlg = 1
+2176             Else
+2177                 'Retry回数終了でもNG判定(OKフラグoffなら抜ける)
+2178                 If MSetGrNumRetryCnt = 0 Then
+2179                     MSetGrNumRetryExitFlg = 1
+2180                 Else
+2181                     'Retryへ　その前にDelay
+2182                     Dly 0.5
+2183                     MSetGrNumRetryCnt = MSetGrNumRetryCnt - 1       'RetryCnt-1
+2184                 EndIf
+2185             EndIf
+2186             '----- 検査グループ設定Retry追加ここまで 20200410
+2187             '
+2188         WEnd
+2189         '
+2190         '
+2191         '
+2192         '----- 検査実行 -----
+2193         If MCurrentStepErr = 0  Then                                '検査G番号設定NGの場合は検査実行しない
+2194             If 0 < MInspGrNum%(MNum%) Then                          '検査あり?
+2195                 MJudgeOKFlg = 0                                     '検査OKフラグクリア
+2196                 MInspRetryExitFlg = 0
+2197                 MRetryCnt = 2                                        'Retry回数設定
+2198                 While( MInspRetryExitFlg = 0 )
+2199                     M_Out( MOUT_IS_Insp% ) = 1                      '検査実行要求on
+2200                     '
+2201                     '検査完了確認
+2202                     MRetryCnt = MRetryCnt - 1
+2203                     M_Timer(1) = 0
+2204                     MExitFlg = 0
+2205                     While( MExitFlg = 0 )
+2206                     '検査完了待ち
+2207                         '検査OK終了?
+2208                         If M_In( MIN_IS_InspOK% ) = 1  Then
+2209                             MJudgeOKFlg = 1                         '検査OKフラグON
+2210                             MExitFlg = 1
+2211                         '
+2212                         '検査NG終了?
+2213                         ElseIf M_In( MIN_IS_InspNG% ) = 1  Then
+2214                             If MInspErrNum = 0 Then                 '1回目のエラー?
+2215                                 If MRetryCnt = 0 Then               'RetryしてもNGならNGとする
+2216                                     MInspErrNum = 32                    '検査NG エラー番号=32
+2217                                     MInspNGStepNum = MInspGrNum%(MNum%) 'エラー検査G番号設定
+2218                                 EndIf
+2219                             EndIf
+2220                             MExitFlg = 1
+2221                         '
+2222                         '検査異常終了(IS timeout)?
+2223                         ElseIf M_In( MIN_IS_InspErr% ) = 1  Then
+2224                             If MInspErrNum = 0 Then                 '1回目のエラー?
+2225                                 If MRetryCnt = 0 Then               'RetryしてもNGならNGとする
+2226                                     MInspErrNum = 38                    '検査異常終了 エラー番号=38
+2227                                     MInspNGStepNum = MInspGrNum%(MNum%) 'エラー検査G番号設定
+2228                                 EndIf
+2229                             EndIf
+2230                             MExitFlg = 1
+2231                         '
+2232                         'timeoutチェック
+2233                         ElseIf 3000 < M_Timer(1) Then
+2234                             If MInspErrNum = 0 Then                 '1回目のエラー?
+2235                                 If MRetryCnt = 0 Then               'RetryしてもNGならNGとする
+2236                                     MInspErrNum = 34                    '検査異常終了 エラー番号=34
+2237                                     MInspNGStepNum = MInspGrNum%(MNum%) 'エラー検査G番号設定
+2238                                 EndIf
+2239                             EndIf
+2240                             MExitFlg = 1
+2241                         EndIf
+2242                     WEnd
+2243                     '
+2244                     '検査開始要求off
+2245                     M_Out(MOUT_IS_Insp%) = 0                        '検査実行要求off
+2246                     '
+2247                     'OKなら抜ける
+2248                     If MJudgeOKFlg = 1 Then
+2249                         MInspRetryExitFlg = 1
+2250                     Else
+2251                         'Retry回数終了でもNG判定(OKフラグoffなら抜ける)
+2252                         If MRetryCnt = 0 Then
+2253                             MInspRetryExitFlg = 1
+2254                         Else
+2255                             'Retryへ　その前にDelay
+2256                             Dly 0.3
+2257                         EndIf
+2258                     EndIf
+2259                     '
+2260                 WEnd
+2261             EndIf
+2262         EndIf
+2263         '
+2264         '
+2265         '
+2266         MNum% = MNum% + 1                                           '検査Step+1
+2267         '検査終了確認　検査終了フラグセット
+2268         If (MInspCnt% < MNum% ) Then
+2269             MEndFlg% = 1                                            '検査終了フラグセット
+2270         EndIf
+2271         'NG発生時続行時処理
+2272         If MInspErrNum <> 0 Then                                    'NGあり?
+2273             If MNgContinue% <> 1 Then                               'NG続行?
+2274                 MEndFlg% = 1                                        '検査終了フラグセット
+2275             EndIf
+2276         EndIf
+2277     WEnd
+2278     '
+2279     '終了時にZ軸をMZAxisで設定された位置まで上昇させる
+2280     If 0 < MZAxis% Then
+2281         PCurrentPos = P_Curr                                        '現在位置取得
+2282         PCurrentPos.Z = MZAxis%                                     'Z軸を設定
+2283         Mvs PCurrentPos                                             '現在位置上空へ移動
+2284     EndIf
+2285     Fine 0 , P
+2286     '
+2287     '戻り値設定
+2288     If MInspErrNum = 0 Or M_In(11372) = 1 Then                      'カメラ検査強制OK(M_In(11372)=1)追加(12/21中村)
+2289         ISInspectionSingle = 1                                      '正常終了戻り値設定
+2290     Else
+2291         M_Out16(MOUT_InspErrNum) = MInspErrNum                      '検査実行エラー番号出力
+2292         M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum                '検査実行NGStep番号出力
+2293         ISInspectionSingle = 0                                      '異常終了戻り値設定
+2294     EndIf
+2295     '
+2296 FEnd
+2297 '
+2298 ' ■ISInspection
+2299 ''' <summary>
+2300 ''' Insightによる画像処理検査実行
+2301 ''' </summary>
+2302 '''<param name="PInspPos()">検査位置</param>
+2303 '''<param name="MInspGrNum%()">検査位置での検査グループ番号（=0：画像検査未実施）</param>
+2304 '''             PInspPos()、MInspGrNum%()は同じ添え字（検査Step）のものがペア
+2305 '''<param name="MInspCnt%">検査位置数</param>
+2306 '''<param name="MZAxis%">終了時のZ軸退避座標（-1:無効）</param>
+2307 '''             終了時にZ軸をMZAxisで設定された位置まで上昇させる
+2308 '''<param name="MNgContinue%">=1で検査エラー・NG発生時に全Stepの検査を行う</param>
+2309 '''<returns>    整数 0=異常終了、1=正常終了</returns>
+2310 '''         MInspErrNum     ：異常終了時にエラー番号が設定される
+2311 '''         MInspNGStepNum  ：検査NG発生時の検査グループ番号が設定される"
+2312 ''' <remarks>
+2313 ''' Date   : 2021/07/07 : M.Hayakawa
+2314 ''' </remarks>
+2315 'Function M% ISInspection( ByVal PInspPos(), ByVal MInspGrNum%(), ByVal MInspCnt%, ByVal MZAxis%, ByVal MNgContinue% )
+2316 '    '画像使用確認 0<- 画像確認無しの場合
+2317 '    If M_In(11369) = 0 Then            'toRBT_使用確認
+2318 '        ISInspection = 1                                        '正常終了戻り値設定
+2319 '    EndIf
+2320 ''
+2321 '    Cnt 0                                                       '移動効率化解除(初期値=0)
+2322 '    Fine 0.05,P                                                 '位置決め完了条件設置　0.05mm
+2323 '    MNum% = 1                                                   '検査番号初期値設定
+2324 '    Def Inte MEndFlg                                            '検査終了フラグ
+2325 '    MEndFlg% = 0
+2326 '    '
+2327 '    'エラー番号クリア
+2328 '    MInspErrNumSub = 0                                          '検査実行エラー番号sub
+2329 '    MInspErrNum = 0                                             '検査実行エラー番号
+2330 '    M_Out16(MOUT_InspErrNum) = MInspErrNum
+2331 '    MInspNGStepNum = 0                                          '検査実行NGStep番号
+2332 '    M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum
+2333 '    '
+2334 '    If M_In(MIN_IS_Ready) = 0 Then                              'Ready offなら終了
+2335 '        MInspErrNum = 20                                        '検査実行エラー番号 20 Insight offline
+2336 '        M_Out16(MOUT_InspErrNum) = MInspErrNum                  '検査実行エラー番号出力
+2337 '        M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum            '検査実行NGStep番号出力
+2338 '        ISInspection = 0                                        '異常終了戻り値設定
+2339 ''
+2340 '    EndIf
+2341 '   If M_In(MIN_IS_Ready) = 0 Then *ISInspection_End
+2342 '    '
+2343 '    '検査位置数確認
+2344 '    If MInspCnt% < 1 Or 30 < MInspCnt% Then
+2345 '        MInspErrNum = 21                                        '検査データなし 21　引数<1
+2346 '        M_Out16(MOUT_InspErrNum) = MInspErrNum                  '検査実行エラー番号出力
+2347 '        M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum            '検査実行NGStep番号出力
+2348 '        ISInspection = 0                                        '異常終了戻り値設定
+2349 ''
+2350 '    EndIf
+2351 '   If MInspCnt% < 1 Or 30 < MInspCnt% Then *ISInspection_End
+2352 '    '
+2353 '    '設定された検査位置数分の検査実行
+2354 '    While( MEndFlg% = 0 )
+2355 '        '検査終了確認　検査終了フラグセット
+2356 '        If (MInspCnt% < MNum% ) Then
+2357 '            MEndFlg% = 1                                        '検査終了フラグセット
+2358 '        EndIf
+2359 '        '
+2360 '        'タスク　検査G番号設定・検査完了確認処理開始　INSPTAST1
+2361 '        If MEndFlg% = 0 Then
+2362 '            M_01# = MInspGrNum%(MNum%)                          '検査G番号引渡し
+2363 '        EndIf
+2364 '        M_02# = MEndFlg%                                        '検査終了フラグ引渡し
+2365 '        M_05# = MNum%                                           '検査番号(検査順1～)
+2366 '        'タスク　検査G設定フラグ引渡し
+2367 '        If MEndFlg% = 0 Then
+2368 '            If 0 < MInspGrNum%(MNum%) Then
+2369 '                M_03# = 1
+2370 '            Else
+2371 '                M_03# = 0
+2372 '            EndIf
+2373 '        Else
+2374 '            M_03# = 0
+2375 '        EndIf
+2376 '        'タスク　検査結果確認フラグ引渡し
+2377 '        If 1 < MNum% Then
+2378 '            If 0 < MInspGrNum%(MNum%-1) Then
+2379 '                M_04# = 1
+2380 '            Else
+2381 '                M_04# = 0
+2382 '            EndIf
+2383 '        Else
+2384 '            M_04# = 0
 2385 '        EndIf
 2386 '        '
-2387 '        '検査結果確認
-2388 '        If 0 = MInspErrNum Then
-2389 '            If 1 < MNum% Then
-2390 '                If 0 < MInspGrNum%(MNum%-1) Then                '検査あり?
-2391 '                    If M_11# = 2 Then                           '検査NG?
-2392 '                        If MNgContinue% = 1 Then                'NG続行?
-2393 '                            If MInspNGStepNum = 0 Then          'NG未発生?
-2394 '                                MInspNGStepNum = MInspGrNum%(MNum%-1)   '検査実行NG　検査G番号設定
-2395 '                            EndIf
-2396 '                            MInspErrNumSub = 32                 'エラー番号設定 32:検査NG
-2397 '                        Else
-2398 ''                            MInspNGStepNum = MNum% - 1          '検査実行NGStep番号設定
-2399 '                            MInspNGStepNum = MInspGrNum%(MNum%-1)   '検査実行NG　検査G番号設定
-2400 '                            MInspErrNum = 32                    'エラー番号設定 32:検査NG
-2401 '                        EndIf
-2402 '                   EndIf
+2387 '        'タスク処理開始
+2388 '        M_00# = 1                                               'TASK処理開始
+2389 '        'タスク処理開始確認
+2390 '        M_Timer(1) = 0
+2391 '        MExitFlg = 0
+2392 '        While( MExitFlg = 0 )
+2393 '            '処理開始完了確認
+2394 '            If M_00# = 0 And M_10# = 8 Then
+2395 '                MExitFlg = 1
+2396 '            EndIf
+2397 '            'timeoutチェック
+2398 '            If 2000 < M_Timer(1) Then
+2399 '                If MNgContinue% = 1 Then                        'NG続行?
+2400 '                    MInspErrNumSub = 36                         'エラー番号設定36
+2401 '                Else
+2402 '                    MInspErrNum = 36                            'エラー番号設定36
 2403 '                EndIf
-2404 '            EndIf
-2405 '        EndIf
-2406 '        '
-2407 '        'エラーなら検査中断終了するのでLoopから抜けるため終了フラグセット
-2408 '        If 0 <> MInspErrNum Then
-2409 '            MEndFlg% = 1
-2410 '        EndIf
-2411 '        '
-2412 '        '検査実行、取込完了待ち
-2413 '        If 0 = MInspErrNum Then
-2414 '            If MEndFlg% = 0 Then
-2415 '                If 0 < MInspGrNum%(MNum%) Then                  '検査あり?
-2416 '                    M_Out(MOUT_IS_Insp%) = 1                    '検査実行要求on
-2417 '                    '取込完了確認
-2418 '                    M_Timer(1) = 0
-2419 '                    MExitFlg = 0
-2420 '                    While( MExitFlg = 0 )
-2421 '                        '処理完了待ち
-2422 '                        If M_In( MIN_IS_InspCapDone% ) = 1  Then
-2423 '                            MExitFlg = 1
-2424 '                        EndIf
-2425 '                        'timeoutチェック
-2426 '                        If 2000 < M_Timer(1) Then
-2427 '                            If MNgContinue% = 1 Then            'NG続行?
-2428 '                                MInspErrNumSub = 33             'エラー番号設定33
-2429 '                            Else
-2430 '                                MInspErrNum = 33                'エラー番号設定33
-2431 '                            EndIf
-2432 '                            MExitFlg = 1
-2433 '                        EndIf
-2434 '                    WEnd
-2435 '                EndIf
-2436 '                '
-2437 '            EndIf
-2438 '        EndIf
-2439 '        MNum% = MNum% + 1
-2440 '    WEnd
-2441 '    '
-2442 '    '終了時にZ軸をMZAxisで設定された位置まで上昇させる
-2443 '    If 0 < MZAxis% Then
-2444 '        PCurrentPos = P_Curr                                    '現在位置取得
-2445 '        PCurrentPos.Z = MZAxis%                                 'Z軸を設定
-2446 '        Mvs PCurrentPos                                         '現在位置上空へ移動
-2447 '    EndIf
-2448 '    '
-2449 '    'NG続行時処理
-2450 '    If MNgContinue% = 1 Then                                    'NG続行?
-2451 '        MInspErrNum = MInspErrNumSub                            'エラー番号設定
-2452 '    EndIf
-2453 '    '
-2454 '    '戻り値設定
-2455 '    If MInspErrNum = 0 Then
-2456 '        ISInspection = 1                                        '正常終了戻り値設定
-2457 '    Else
-2458 '        M_Out16(MOUT_InspErrNum) = MInspErrNum                  '検査実行エラー番号出力
-2459 '        M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum            '検査実行NGStep番号出力
-2460 '        ISInspection = 0                                        '異常終了戻り値設定
-2461 '    EndIf
-2462 '    '
-2463 '*ISInspection_End
-2464 'FEnd
-2465 '
-2466 '■InitialZoneB
-2467 ''' <summary>
-2468 ''' 非常停止後の復帰動作
-2469 ''' 1)上空退避　Z方向上に移動
-2470 ''' 2)J1軸以外を退避ポジションへ移動
-2471 ''' 3)J1軸のみを退避ポジションへ移動
-2472 ''' 4)イニシャルポジションへ移動
-2473 ''' </summary>
-2474 ''' <remarks>
-2475 ''' Date : 2022/04/08 : N.Watanabe
-2476 ''' </remarks>
-2477 Function V fnInitialZoneB()
-2478     fnAutoScreenComment(520)    '状態表示[６軸ロボ初期位置移動中] 2022/04/26 渡辺
-2479 '
-2480 'パラメータ
-2481     Ovrd 5
-2482 '    CmpG 0.5, 0.5, 1.0, 1.0, 1.0, 0.5, ,
-2483 '    Cmp Pos, &B100011
-2484 '
-2485 '復帰動作開始
-2486 '
-2487 '置き台と両掴みの場所は、チャックを解放する
-2488 *RecoveryChuckOpen
-2489     PActive = P_Curr          '現在位置を取得
-2490     MRecoveryChuckOpen = 0    'チャック解放フラグ 初期化
-2491 'PProductOnRoboSet(ねじロボ製品置き位置)は、チャック解放
-2492     If (PActive.X <= PProductOnRoboSet.X + 1.0) And (PActive.X >= PProductOnRoboSet.X -1.0) Then
-2493         If (PActive.Y <= PProductOnRoboSet.Y + 1.0) And (PActive.Y >= PProductOnRoboSet.Y -1.0) Then
-2494             If (PActive.Z <= PProductOnRoboSet.Z + 1.0) And (PActive.Z >= PProductOnRoboSet.Z -1.0) Then
-2495                 MRecoveryChuckOpen = 1
-2496             EndIf
-2497         EndIf
-2498     EndIf
-2499 'PProductOnRoboGet(ねじロボ製品取り位置)は、チャック解放
-2500     If (PActive.X <= PProductOnRoboGet.X + 1.0) And (PActive.X >= PProductOnRoboGet.X -1.0) Then
-2501         If (PActive.Y <= PProductOnRoboGet.Y + 1.0) And (PActive.Y >= PProductOnRoboGet.Y -1.0) Then
-2502             If (PActive.Z <= PProductOnRoboGet.Z + 1.0) And (PActive.Z >= PProductOnRoboGet.Z -1.0) Then
-2503                 MRecoveryChuckOpen = 1
-2504             EndIf
-2505         EndIf
-2506     EndIf
-2507 '
-2508     If MRecoveryChuckOpen = 0 Then GoTo *RecoveryChuckOpenEnd
-2509     M_Out(12256) = 0                           '本体チャック閉OFF
-2510     M_Out(12257) = 1                           '本体チャック開ON
-2511 '
-2512     M_20# = 0                                  'KEY入力初期化
-2513     MRtn = frInCheck(11265,1,MSETTIMEOUT05&)   '本体チャック開検出
-2514     If MRtn = 1 Then M_Out(12257) = 0          '本体チャック開OFF
-2515     If MRtn = 1 Then GoTo *RecoveryChuckOpenEnd
-2516 '
-2517     fErrorProcess(11,244,284,0)
-2518     If M_20# = MNext% Then M_20# = MClear%
-2519     If M_20# = MAbout% Then GoTo *RecoveryEnd
-2520     If M_20# = MNgProcess% Then GoTo *RecoveryEnd
-2521     If M_20# = MContinue% Then GoTo *RecoveryChuckOpen
-2522 '
-2523     *RecoveryChuckOpenEnd
-2524 '
-2525 '背面板回避
-2526 'PPlateBackSet～PPlateBackSet_6のエリアにいるときは、本体チャック開く
-2527 '・PPlateBackSet_6         '経路6
-2528 '・PPlateBackSet_5         '経路7
-2529 '・PPlateBackSet_4         '経路8
-2530 '・PPlateBackSet_3         '経路9
-2531 '・PPlateBackSet_2         '経路10
-2532 '・PPlateBackSet_1         '経路11
-2533 '・PPlateBackSet           '背面板置き位置
-2534 '上記７点のＸ座標・Ｙ座標・Ｚ座標とJ6軸が下記If文の範囲に入っている事を確認する事
-2535     PActive = P_Curr                    '現在位置を取得
-2536     JActive = J_Curr                    '現在位置を取得
-2537     MJ6 = Deg(JActive.J6)               'J6軸の値を比較する為に代入
-2538     If (PActive.X >= -35) And (PActive.X <= -5) Then
-2539         If (PActive.Y >= 340) And (PActive.Y <= 510) Then
-2540             If (PActive.Z >= 470) And (PActive.Z <= 560) Then
-2541                 If (MJ6 >= 160) And (MJ6 <= 200) Then
-2542                     M_Out(12256) = 0            '本体チャック閉OFF
-2543                     M_Out(12257) = 1            '本体チャック開ON
-2544                 Dly 1.0
-2545                 EndIf
-2546             EndIf
-2547         EndIf
-2548     EndIf
-2549 '
-2550 '
-2551 '特殊回避　直接、上空退避が出来ない所の対処
-2552 '
-2553     Ovrd 1
-2554 'PProductOnRoboSet(Get)～PProductOnRoboSet(Get)_2のエリアにいるときは、PProductOnRoboSet_2へ
-2555 '・PProductOnRoboSet
-2556 '・PProductOnRoboSet_1
-2557 '・PProductOnRoboSet_2
-2558 '・PProductOnRoboGet
-2559 '・PProductOnRoboGet_1
-2560 '・PProductOnRoboGet_2
-2561 '上記６点のＸ座標・Ｙ座標・Ｚ座標が下記If文の範囲に入っている事を確認する事
-2562     PActive = P_Curr                    '現在位置を取得
-2563     JActive = J_Curr                    '現在位置を取得
-2564     MJ6 = Deg(JActive.J6)               'J6軸の値を比較する為に代入
-2565     If (PActive.X >= -35) And (PActive.X <= 0) Then
-2566         If (PActive.Y >= 350) And (PActive.Y <= 420) Then
-2567             If (PActive.Z >= 300) And (PActive.Z <= 450) Then
-2568                 If (MJ6 >= -20) And (MJ6 <= 20) Then
-2569                     Mvs PProductOnRoboSet_1
-2570                     Dly 1.0
-2571                     Mvs PProductOnRoboSet_2
-2572                     Dly 1.0
-2573                     Mov PProductOnRoboSet_3
-2574                     Dly 1.0
-2575                 EndIf
-2576             EndIf
-2577         EndIf
-2578     EndIf
-2579 '
-2580 'PProductOnRoboSet(Get)_2～PProductOnRoboSet(Get)_3のエリアにいるときは、PProductOnRoboSet_3へ
-2581 '・PProductOnRoboSet_2
-2582 '・PProductOnRoboSet_3
-2583 '・PProductOnRoboGet_2
-2584 '・PProductOnRoboGet_3
-2585 '上記４点のＸ座標・Ｙ座標・Ｚ座標が下記If文の範囲に入っている事を確認する事
-2586     PActive = P_Curr                    '現在位置を取得
-2587     JActive = J_Curr                    '現在位置を取得
-2588     MJ6 = Deg(JActive.J6)               'J6軸の値を比較する為に代入
-2589     If (PActive.X >= -35) And (PActive.X <= 0) Then
-2590         If (PActive.Y >= 280) And (PActive.Y <= 390) Then
-2591             If (PActive.Z >= 410) And (PActive.Z <= 570) Then
-2592                 If (MJ6 >= -20) And (MJ6 <= 20) Then
-2593                     Mvs PProductOnRoboSet_3
-2594                     Dly 1.0
-2595                 EndIf
-2596             EndIf
-2597         EndIf
-2598     EndIf
-2599 '
-2600     Ovrd 5
-2601 '
-2602 '上空退避
-2603     PActive = P_Curr
-2604     Pmove = PActive
-2605     Pmove.Z = 640           '上空退避する一律の高さ
-2606     If PActive.X > 550 Then
-2607         Pmove.Z =550        'パレット上に腕を伸ばしているときは640まで上げられない為、例外処置
-2608     EndIf
-2609     If PActive.Z < Pmove.Z Then
-2610         Mvs Pmove
-2611     EndIf
-2612     Dly 1.0
-2613 'J1軸以外を退避ポジションへ移動
-2614     JActive = J_Curr
-2615     Jmove = JTaihi
-2616     Jmove.J1 = JActive.J1        'J1軸は現在値を使用し、JTaihiのポーズを取る
-2617     Jmove.J6 = JActive.J6        'J6軸は現在値を使用し、JTaihiのポーズを取る
-2618     Mov Jmove
-2619     Dly 1.0
-2620 'J1軸のみを退避ポジションへ移動
-2621     Mov JTaihi
-2622     Dly 1.0
-2623 'イニシャルポジションへ移動
-2624     Mov PInitialPosition
-2625     Cmp Off
-2626     Ovrd 100
-2627 ' ねじロボを初期位置に戻すために強制的に自動運転開始
-2628     If M_In(11856) = 0 Then                 ' 停止中のみ
-2629         fnAutoScreenComment(501)            ' 状態表示[ネジ締め機自動運転開始中] 2022/04/25 渡辺
-2630         M_Out(12834) = 1                    ' 自動運転開始ON 12834   M6834
-2631         MRet = frInCheck(11842, 1, 30000&)  ' 自動運転開始受信待ち    11842   M5842
-2632         If MRet = 0 Then
-2633         Else
-2634             M_Out(12834) = 0    ' 自動運転開始OFF 12834   M6834
+2404 '                MExitFlg = 1
+2405 '            EndIf
+2406 '        WEnd
+2407 '        '
+2408 '        '検査位置へ移動・移動完了待ち
+2409 '        If 0 = MInspErrNum Then
+2410 '            If MEndFlg% = 0 Then
+2411 '                Mvs PInspPos( MNum% )                           '移動
+2412 '            EndIf
+2413 '        EndIf
+2414 '        '
+2415 '        'タスク　検査G番号設定・検査完了確認処理終了待ち　INSPTAST1
+2416 '        If 0 = MInspErrNum Then
+2417 '            M_Timer(1) = 0
+2418 '            MExitFlg = 0
+2419 '            While( MExitFlg = 0 )
+2420 '                '処理完了待ち（正常終了）
+2421 '                If M_10# = 1 Then
+2422 '                    MExitFlg = 1
+2423 '                EndIf
+2424 '                '処理完了待ち（異常終了）
+2425 '                If M_10# = 0 Then
+2426 '                    If MNgContinue% = 1 Then                    'NG続行?
+2427 '                        MInspErrNumSub = M_12#                  'エラー番号設定　M12
+2428 '                    Else
+2429 '                        MInspErrNum = M_12#                     'エラー番号設定　M12
+2430 '                    EndIf
+2431 '                    MExitFlg = 1
+2432 '                EndIf
+2433 '                'timeoutチェック
+2434 '                If 5000 < M_Timer(1) Then
+2435 '                    If MNgContinue% = 1 Then                    'NG続行?
+2436 '                        MInspErrNumSub = 31                     'エラー番号設定31
+2437 '                    Else
+2438 '                        MInspErrNum = 31                        'エラー番号設定31
+2439 '                    EndIf
+2440 '                    MExitFlg = 1
+2441 '                EndIf
+2442 '            WEnd
+2443 '        EndIf
+2444 '        '
+2445 '        '検査結果確認
+2446 '        If 0 = MInspErrNum Then
+2447 '            If 1 < MNum% Then
+2448 '                If 0 < MInspGrNum%(MNum%-1) Then                '検査あり?
+2449 '                    If M_11# = 2 Then                           '検査NG?
+2450 '                        If MNgContinue% = 1 Then                'NG続行?
+2451 '                            If MInspNGStepNum = 0 Then          'NG未発生?
+2452 '                                MInspNGStepNum = MInspGrNum%(MNum%-1)   '検査実行NG　検査G番号設定
+2453 '                            EndIf
+2454 '                            MInspErrNumSub = 32                 'エラー番号設定 32:検査NG
+2455 '                        Else
+2456 ''                            MInspNGStepNum = MNum% - 1          '検査実行NGStep番号設定
+2457 '                            MInspNGStepNum = MInspGrNum%(MNum%-1)   '検査実行NG　検査G番号設定
+2458 '                            MInspErrNum = 32                    'エラー番号設定 32:検査NG
+2459 '                        EndIf
+2460 '                   EndIf
+2461 '                EndIf
+2462 '            EndIf
+2463 '        EndIf
+2464 '        '
+2465 '        'エラーなら検査中断終了するのでLoopから抜けるため終了フラグセット
+2466 '        If 0 <> MInspErrNum Then
+2467 '            MEndFlg% = 1
+2468 '        EndIf
+2469 '        '
+2470 '        '検査実行、取込完了待ち
+2471 '        If 0 = MInspErrNum Then
+2472 '            If MEndFlg% = 0 Then
+2473 '                If 0 < MInspGrNum%(MNum%) Then                  '検査あり?
+2474 '                    M_Out(MOUT_IS_Insp%) = 1                    '検査実行要求on
+2475 '                    '取込完了確認
+2476 '                    M_Timer(1) = 0
+2477 '                    MExitFlg = 0
+2478 '                    While( MExitFlg = 0 )
+2479 '                        '処理完了待ち
+2480 '                        If M_In( MIN_IS_InspCapDone% ) = 1  Then
+2481 '                            MExitFlg = 1
+2482 '                        EndIf
+2483 '                        'timeoutチェック
+2484 '                        If 2000 < M_Timer(1) Then
+2485 '                            If MNgContinue% = 1 Then            'NG続行?
+2486 '                                MInspErrNumSub = 33             'エラー番号設定33
+2487 '                            Else
+2488 '                                MInspErrNum = 33                'エラー番号設定33
+2489 '                            EndIf
+2490 '                            MExitFlg = 1
+2491 '                        EndIf
+2492 '                    WEnd
+2493 '                EndIf
+2494 '                '
+2495 '            EndIf
+2496 '        EndIf
+2497 '        MNum% = MNum% + 1
+2498 '    WEnd
+2499 '    '
+2500 '    '終了時にZ軸をMZAxisで設定された位置まで上昇させる
+2501 '    If 0 < MZAxis% Then
+2502 '        PCurrentPos = P_Curr                                    '現在位置取得
+2503 '        PCurrentPos.Z = MZAxis%                                 'Z軸を設定
+2504 '        Mvs PCurrentPos                                         '現在位置上空へ移動
+2505 '    EndIf
+2506 '    '
+2507 '    'NG続行時処理
+2508 '    If MNgContinue% = 1 Then                                    'NG続行?
+2509 '        MInspErrNum = MInspErrNumSub                            'エラー番号設定
+2510 '    EndIf
+2511 '    '
+2512 '    '戻り値設定
+2513 '    If MInspErrNum = 0 Then
+2514 '        ISInspection = 1                                        '正常終了戻り値設定
+2515 '    Else
+2516 '        M_Out16(MOUT_InspErrNum) = MInspErrNum                  '検査実行エラー番号出力
+2517 '        M_Out16(MOUT_InspNGStepNum) = MInspNGStepNum            '検査実行NGStep番号出力
+2518 '        ISInspection = 0                                        '異常終了戻り値設定
+2519 '    EndIf
+2520 '    '
+2521 '*ISInspection_End
+2522 'FEnd
+2523 '
+2524 '■InitialZoneB
+2525 ''' <summary>
+2526 ''' 非常停止後の復帰動作
+2527 ''' 1)上空退避　Z方向上に移動
+2528 ''' 2)J1軸以外を退避ポジションへ移動
+2529 ''' 3)J1軸のみを退避ポジションへ移動
+2530 ''' 4)イニシャルポジションへ移動
+2531 ''' </summary>
+2532 ''' <remarks>
+2533 ''' Date : 2022/04/08 : N.Watanabe
+2534 ''' </remarks>
+2535 Function V fnInitialZoneB()
+2536     fnAutoScreenComment(520)    '状態表示[６軸ロボ初期位置移動中] 2022/04/26 渡辺
+2537 '
+2538 'パラメータ
+2539     Ovrd 5
+2540 '    CmpG 0.5, 0.5, 1.0, 1.0, 1.0, 0.5, ,
+2541 '    Cmp Pos, &B100011
+2542 '
+2543 '復帰動作開始
+2544 '
+2545 '置き台と両掴みの場所は、チャックを解放する
+2546 *RecoveryChuckOpen
+2547     PActive = P_Curr          '現在位置を取得
+2548     MRecoveryChuckOpen = 0    'チャック解放フラグ 初期化
+2549 'PProductOnRoboSet(ねじロボ製品置き位置)は、チャック解放
+2550     If (PActive.X <= PProductOnRoboSet.X + 1.0) And (PActive.X >= PProductOnRoboSet.X -1.0) Then
+2551         If (PActive.Y <= PProductOnRoboSet.Y + 1.0) And (PActive.Y >= PProductOnRoboSet.Y -1.0) Then
+2552             If (PActive.Z <= PProductOnRoboSet.Z + 1.0) And (PActive.Z >= PProductOnRoboSet.Z -1.0) Then
+2553                 MRecoveryChuckOpen = 1
+2554             EndIf
+2555         EndIf
+2556     EndIf
+2557 'PProductOnRoboGet(ねじロボ製品取り位置)は、チャック解放
+2558     If (PActive.X <= PProductOnRoboGet.X + 1.0) And (PActive.X >= PProductOnRoboGet.X -1.0) Then
+2559         If (PActive.Y <= PProductOnRoboGet.Y + 1.0) And (PActive.Y >= PProductOnRoboGet.Y -1.0) Then
+2560             If (PActive.Z <= PProductOnRoboGet.Z + 1.0) And (PActive.Z >= PProductOnRoboGet.Z -1.0) Then
+2561                 MRecoveryChuckOpen = 1
+2562             EndIf
+2563         EndIf
+2564     EndIf
+2565 '
+2566     If MRecoveryChuckOpen = 0 Then GoTo *RecoveryChuckOpenEnd
+2567     M_Out(12256) = 0                           '本体チャック閉OFF
+2568     M_Out(12257) = 1                           '本体チャック開ON
+2569 '
+2570     M_20# = 0                                  'KEY入力初期化
+2571     MRtn = frInCheck(11265,1,MSETTIMEOUT05&)   '本体チャック開検出
+2572     If MRtn = 1 Then M_Out(12257) = 0          '本体チャック開OFF
+2573     If MRtn = 1 Then GoTo *RecoveryChuckOpenEnd
+2574 '
+2575     fErrorProcess(11,244,284,0)
+2576     If M_20# = MNext% Then M_20# = MClear%
+2577     If M_20# = MAbout% Then GoTo *RecoveryEnd
+2578     If M_20# = MNgProcess% Then GoTo *RecoveryEnd
+2579     If M_20# = MContinue% Then GoTo *RecoveryChuckOpen
+2580 '
+2581     *RecoveryChuckOpenEnd
+2582 '
+2583 '背面板回避
+2584 'PPlateBackSet～PPlateBackSet_6のエリアにいるときは、本体チャック開く
+2585 '・PPlateBackSet_6         '経路6
+2586 '・PPlateBackSet_5         '経路7
+2587 '・PPlateBackSet_4         '経路8
+2588 '・PPlateBackSet_3         '経路9
+2589 '・PPlateBackSet_2         '経路10
+2590 '・PPlateBackSet_1         '経路11
+2591 '・PPlateBackSet           '背面板置き位置
+2592 '上記７点のＸ座標・Ｙ座標・Ｚ座標とJ6軸が下記If文の範囲に入っている事を確認する事
+2593     PActive = P_Curr                    '現在位置を取得
+2594     JActive = J_Curr                    '現在位置を取得
+2595     MJ6 = Deg(JActive.J6)               'J6軸の値を比較する為に代入
+2596     If (PActive.X >= -35) And (PActive.X <= -5) Then
+2597         If (PActive.Y >= 340) And (PActive.Y <= 510) Then
+2598             If (PActive.Z >= 470) And (PActive.Z <= 560) Then
+2599                 If (MJ6 >= 160) And (MJ6 <= 200) Then
+2600                     M_Out(12256) = 0            '本体チャック閉OFF
+2601                     M_Out(12257) = 1            '本体チャック開ON
+2602                 Dly 1.0
+2603                 EndIf
+2604             EndIf
+2605         EndIf
+2606     EndIf
+2607 '
+2608 '
+2609 '特殊回避　直接、上空退避が出来ない所の対処
+2610 '
+2611     Ovrd 1
+2612 'PProductOnRoboSet(Get)～PProductOnRoboSet(Get)_2のエリアにいるときは、PProductOnRoboSet_2へ
+2613 '・PProductOnRoboSet
+2614 '・PProductOnRoboSet_1
+2615 '・PProductOnRoboSet_2
+2616 '・PProductOnRoboGet
+2617 '・PProductOnRoboGet_1
+2618 '・PProductOnRoboGet_2
+2619 '上記６点のＸ座標・Ｙ座標・Ｚ座標が下記If文の範囲に入っている事を確認する事
+2620     PActive = P_Curr                    '現在位置を取得
+2621     JActive = J_Curr                    '現在位置を取得
+2622     MJ6 = Deg(JActive.J6)               'J6軸の値を比較する為に代入
+2623     If (PActive.X >= -35) And (PActive.X <= 0) Then
+2624         If (PActive.Y >= 350) And (PActive.Y <= 420) Then
+2625             If (PActive.Z >= 300) And (PActive.Z <= 450) Then
+2626                 If (MJ6 >= -20) And (MJ6 <= 20) Then
+2627                     Mvs PProductOnRoboSet_1
+2628                     Dly 1.0
+2629                     Mvs PProductOnRoboSet_2
+2630                     Dly 1.0
+2631                     Mov PProductOnRoboSet_3
+2632                     Dly 1.0
+2633                 EndIf
+2634             EndIf
 2635         EndIf
 2636     EndIf
-2637     M_Out(12262) = 0            '位置決め出OFF
-2638     M_Out(12263) = 1            '位置決め戻ON
-2639     fErrorProcess(11,253,281,0)
-2640 *RecoveryEnd
-2641     Exit Function
-2642 FEnd
-2643 '
-2644 '
-2645 '■fnAutoScreenComment
-2646 ''' <summary>
-2647 ''' メイン画面の動作状況表示
-2648 ''' コメントD1005の設定
-2649 ''' </summary>
-2650 '''<param name="McommentD1005%">コメントID</param>
-2651 ''' <remarks>
-2652 ''' Date   : 2021/07/07 : M.Hayakawa
-2653 ''' </remarks>
-2654 Function fnAutoScreenComment(ByVal McommentD1005%)
-2655     M_Out16(12576) = McommentD1005%
-2656 FEnd
+2637 '
+2638 'PProductOnRoboSet(Get)_2～PProductOnRoboSet(Get)_3のエリアにいるときは、PProductOnRoboSet_3へ
+2639 '・PProductOnRoboSet_2
+2640 '・PProductOnRoboSet_3
+2641 '・PProductOnRoboGet_2
+2642 '・PProductOnRoboGet_3
+2643 '上記４点のＸ座標・Ｙ座標・Ｚ座標が下記If文の範囲に入っている事を確認する事
+2644     PActive = P_Curr                    '現在位置を取得
+2645     JActive = J_Curr                    '現在位置を取得
+2646     MJ6 = Deg(JActive.J6)               'J6軸の値を比較する為に代入
+2647     If (PActive.X >= -35) And (PActive.X <= 0) Then
+2648         If (PActive.Y >= 280) And (PActive.Y <= 390) Then
+2649             If (PActive.Z >= 410) And (PActive.Z <= 570) Then
+2650                 If (MJ6 >= -20) And (MJ6 <= 20) Then
+2651                     Mvs PProductOnRoboSet_3
+2652                     Dly 1.0
+2653                 EndIf
+2654             EndIf
+2655         EndIf
+2656     EndIf
 2657 '
-2658 '■fnRoboPosChk
-2659 ''' <summary>
-2660 ''' 最後に終了したロボットポジションの確認
-2661 ''' </summary>
-2662 '''<param name="MINNumber%">入力番号</param>
-2663 '''<param name="MCMPFLG%">0:OFF確認 1:ON確認</param>
-2664 '''<param name="MTimeCnt&">タイムアウト時間</param>
-2665 ''' PLCに保続した番号を読込み、確認
-2666 ''' MRBTOpeGroupNo = 5 が初期位置に設定
-2667 '''<returns>整数 0:タイムアウト 1:OK</returns>
-2668 ''' <remarks>
-2669 ''' Date   : 2021/07/07 : M.Hayakawa
-2670 ''' </remarks>
-2671 Function M% fnRoboPosChk
-2672     fnRoboPosChk = 0
-2673     MRet = fnStepRead()
-2674     '初期位置でないと判断した場合
-2675     'ウィンド画面切換え
-2676     If MRBTOpeGroupNo > 5 Then
-2677         '下記キー待ちの継続に反応させないため
-2678         Wait M_In(11347) = 0                 'toRBT_継続の完了待ち
-2679         Dly 0.2
-2680         Wait M_In(11347) = 0                 'toRBT_継続の完了待ち　2重確認
-2681         Dly 1.5
-2682         '
-2683         fnWindScreenOpen(MWindErrScr,  64, 65, 0)  'ウィンド画面エラー表示とコメント設定
-2684         '
-2685         MLoopFlg% = 1
-2686         While MLoopFlg% = 1
-2687             '
-2688             '
-2689             MKeyNumber% = fnKEY_WAIT()
-2690             Select MKeyNumber%
-2691                 Case Is = MAbout%       '停止
-2692                     M_20# = MAbout%
-2693                     MLoopFlg% = -1
-2694                     Break
-2695                 Case Is = MNext%        '次へ
-2696                     'MLoopFlg% = -1
-2697                     Break
-2698                 Case Is = MContinue%    '継続
-2699                     M_20# = MContinue%
-2700                     MLoopFlg% = -1
-2701                     Break
-2702                 Default
-2703                     Break
-2704             End Select
-2705         WEnd
-2706     EndIf
-2707     '
-2708     If M_20# = MContinue% Then                              '継続ボタンが押された場合
-2709         fnWindScreenOpen(MWindInforScr,  0, 0, 34)   'ウィンド画面エラー表示とコメント設定
-2710         Ovrd 5                                   '低速オーバーライド値設定
-2711         Select MRBTOpeGroupNo
-2712             Case Is = 5                          '何もしない
-2713                 Break
-2714             Case Is = 10                         '初期位置へ戻す
-2715                 'Mov PTEST001
-2716                 Break
-2717             Case Is = 15                         '初期位置へ戻す
-2718                 'Mov PTEST002
-2719                 Dly 0.5
-2720                 'Mov PTEST001
-2721                 Dly 0.5
-2722                 Break
-2723             Default
-2724                 Break
-2725         End Select
-2726         '
-2727         Ovrd M_NOvrd                            'システムの初期値を設定
-2728         M_Out(12364) = 1                        'toPLC_データ保存ON
-2729         MRBTOpeGroupNo = 5
-2730         MRet = fnStepWrite(MRBTOpeGroupNo)      '初期位置の番号転送
-2731         Dly 1.0
-2732         M_Out(12364) = 0                        'toPLC_データ保存OFF
-2733         fnRoboPosChk = 1                        '初期位置動作実行
-2734         fnWindScreenOpen(MWindReSet,  0, 0, 10)  'ウィンド画面エラー表示とコメント設定
-2735     EndIf
-2736     Exit Function
-2737 FEnd
-2738 '
-2739 '■frInCheck
-2740 ''' <summary>
-2741 ''' センサーINチェック
-2742 ''' </summary>
-2743 '''<param name="MINNumber%">入力番号</param>
-2744 '''<param name="MCMPFLG%">0:OFF確認 1:ON確認</param>
-2745 '''<param name="MTimeCnt&">タイムアウト時間</param>
-2746 '''<returns>整数 0:タイムアウト 1:OK</returns>
-2747 ''' <remarks>
-2748 ''' Date   : 2021/07/07 : M.Hayakawa
-2749 ''' </remarks>
-2750 Function M% frInCheck(MINNumber%, MCMPFLG%, MTimeCnt&)
-2751     M_Timer(4) = 0
-2752     MloopFlg = 0
-2753     While MloopFlg = 0
-2754         MCrtTime& = M_Timer(4)
-2755         If M_In(MINNumber%) = MCMPFLG% Then
-2756             MloopFlg = 1
-2757             frInCheck = 1
-2758         ElseIf MCrtTime& > MTimeCnt& Then
-2759             MloopFlg = 1
-2760             frInCheck = 0
-2761         EndIf
-2762     WEnd
-2763 FEnd
-2764 '-----------------------------------------------
-2765 '
-2766 'ねじ締め機通信確認
-2767 '
-2768 '22/09/29 Waitがタイムアウトできるよう修正(中村)
-2769 'fScrewTcomChk = 0　：正常終了
-2770 '          　 　 -1 ：異常終了
-2771 '-----------------------------------------------
-2772 Function M% fScrewTcomChk
-2773 *ReCheckScewTcomChk
-2774     fScrewTcomChk = 0
-2775     '通信確認送信
-2776     M_Out(MOUT_ScwT_ComChk%) = MOn%
-2777     '通信確認受信待機
-2778 '    Wait M_In(MIN_ScwT_comOK%) = MOn%
-2779     MRtn = fTimeOutJudge(MIN_ScwT_comOK%,MOn%)
-2780     '通信確認送信終了
-2781     M_Out(MOUT_ScwT_ComChk%) = MOff%
-2782     If MRtn = 0 Then
-2783         fScrewTcomChk = -1
-2784     EndIf
-2785     If MRtn = 2 Then GoTo *ReCheckScewTcomChk
-2786  '
-2787 FEnd
-2788 '
-2789 '
-2790 '-----------------------------------------------
-2791 '
-2792 'ねじ締め開始送信
-2793 '
-2794 '22/09/29 Waitがタイムアウトできるよう修正(中村)
-2795 'fScrewTStart = 0　：正常終了
-2796 '           　　-1 ：異常終了
-2797 '-----------------------------------------------
-2798 Function M% fScrewTStart
-2799     fScrewTStart = 0
-2800     nRet% = 0
-2801     'ねじ締め開始待機を受信
-2802 '    Wait M_In(MIN_ScwT_STRec%) = MOn%
-2803     MRtn = frInCheck(MIN_ScwT_STRec%,MOn%,MSETTIMEOUT05&)
-2804     If MRtn = 0 Then nRet% = -1
-2805     If MRtn = 0 Then GoTo *ScrewStartERROR      '開始できなかった場合ジャンプ
-2806     Dly 0.1
-2807     'ねじ締め開始受信を送信
-2808     M_Out(MOUT_ScwT_ST%) = MOn%
-2809     Dly 0.5
-2810     'Wait M_In(MTEST_KEY%) = MOn%
-2811     'ねじ締め開始送信終了
-2812     M_Out(MOUT_ScwT_ST%) = MOff%
-2813     '
-2814 *ScrewStartERROR
-2815     fScrewTStart = nRet%
-2816 FEnd
-2817 '
-2818 '
-2819 '
-2820 '-----------------------------------------------
-2821 '
-2822 'ねじ締め完了受信
+2658     Ovrd 5
+2659 '
+2660 '上空退避
+2661     PActive = P_Curr
+2662     Pmove = PActive
+2663     Pmove.Z = 640           '上空退避する一律の高さ
+2664     If PActive.X > 550 Then
+2665         Pmove.Z =550        'パレット上に腕を伸ばしているときは640まで上げられない為、例外処置
+2666     EndIf
+2667     If PActive.Z < Pmove.Z Then
+2668         Mvs Pmove
+2669     EndIf
+2670     Dly 1.0
+2671 'J1軸以外を退避ポジションへ移動
+2672     JActive = J_Curr
+2673     Jmove = JTaihi
+2674     Jmove.J1 = JActive.J1        'J1軸は現在値を使用し、JTaihiのポーズを取る
+2675     Jmove.J6 = JActive.J6        'J6軸は現在値を使用し、JTaihiのポーズを取る
+2676     Mov Jmove
+2677     Dly 1.0
+2678 'J1軸のみを退避ポジションへ移動
+2679     Mov JTaihi
+2680     Dly 1.0
+2681 'イニシャルポジションへ移動
+2682     Mov PInitialPosition
+2683     Cmp Off
+2684     Ovrd 100
+2685 ' ねじロボを初期位置に戻すために強制的に自動運転開始
+2686     If M_In(11856) = 0 Then                 ' 停止中のみ
+2687         fnAutoScreenComment(501)            ' 状態表示[ネジ締め機自動運転開始中] 2022/04/25 渡辺
+2688         M_Out(12834) = 1                    ' 自動運転開始ON 12834   M6834
+2689         MRet = frInCheck(11842, 1, 30000&)  ' 自動運転開始受信待ち    11842   M5842
+2690         If MRet = 0 Then
+2691         Else
+2692             M_Out(12834) = 0    ' 自動運転開始OFF 12834   M6834
+2693         EndIf
+2694     EndIf
+2695     M_Out(12262) = 0            '位置決め出OFF
+2696     M_Out(12263) = 1            '位置決め戻ON
+2697     fErrorProcess(11,253,281,0)
+2698 *RecoveryEnd
+2699     Exit Function
+2700 FEnd
+2701 '
+2702 '
+2703 '■fnAutoScreenComment
+2704 ''' <summary>
+2705 ''' メイン画面の動作状況表示
+2706 ''' コメントD1005の設定
+2707 ''' </summary>
+2708 '''<param name="McommentD1005%">コメントID</param>
+2709 ''' <remarks>
+2710 ''' Date   : 2021/07/07 : M.Hayakawa
+2711 ''' </remarks>
+2712 Function fnAutoScreenComment(ByVal McommentD1005%)
+2713     M_Out16(12576) = McommentD1005%
+2714 FEnd
+2715 '
+2716 '■fnRoboPosChk
+2717 ''' <summary>
+2718 ''' 最後に終了したロボットポジションの確認
+2719 ''' </summary>
+2720 '''<param name="MINNumber%">入力番号</param>
+2721 '''<param name="MCMPFLG%">0:OFF確認 1:ON確認</param>
+2722 '''<param name="MTimeCnt&">タイムアウト時間</param>
+2723 ''' PLCに保続した番号を読込み、確認
+2724 ''' MRBTOpeGroupNo = 5 が初期位置に設定
+2725 '''<returns>整数 0:タイムアウト 1:OK</returns>
+2726 ''' <remarks>
+2727 ''' Date   : 2021/07/07 : M.Hayakawa
+2728 ''' </remarks>
+2729 Function M% fnRoboPosChk
+2730     fnRoboPosChk = 0
+2731     MRet = fnStepRead()
+2732     '初期位置でないと判断した場合
+2733     'ウィンド画面切換え
+2734     If MRBTOpeGroupNo > 5 Then
+2735         '下記キー待ちの継続に反応させないため
+2736         Wait M_In(11347) = 0                 'toRBT_継続の完了待ち
+2737         Dly 0.2
+2738         Wait M_In(11347) = 0                 'toRBT_継続の完了待ち　2重確認
+2739         Dly 1.5
+2740         '
+2741         fnWindScreenOpen(MWindErrScr,  64, 65, 0)  'ウィンド画面エラー表示とコメント設定
+2742         '
+2743         MLoopFlg% = 1
+2744         While MLoopFlg% = 1
+2745             '
+2746             '
+2747             MKeyNumber% = fnKEY_WAIT()
+2748             Select MKeyNumber%
+2749                 Case Is = MAbout%       '停止
+2750                     M_20# = MAbout%
+2751                     MLoopFlg% = -1
+2752                     Break
+2753                 Case Is = MNext%        '次へ
+2754                     'MLoopFlg% = -1
+2755                     Break
+2756                 Case Is = MContinue%    '継続
+2757                     M_20# = MContinue%
+2758                     MLoopFlg% = -1
+2759                     Break
+2760                 Default
+2761                     Break
+2762             End Select
+2763         WEnd
+2764     EndIf
+2765     '
+2766     If M_20# = MContinue% Then                              '継続ボタンが押された場合
+2767         fnWindScreenOpen(MWindInforScr,  0, 0, 34)   'ウィンド画面エラー表示とコメント設定
+2768         Ovrd 5                                   '低速オーバーライド値設定
+2769         Select MRBTOpeGroupNo
+2770             Case Is = 5                          '何もしない
+2771                 Break
+2772             Case Is = 10                         '初期位置へ戻す
+2773                 'Mov PTEST001
+2774                 Break
+2775             Case Is = 15                         '初期位置へ戻す
+2776                 'Mov PTEST002
+2777                 Dly 0.5
+2778                 'Mov PTEST001
+2779                 Dly 0.5
+2780                 Break
+2781             Default
+2782                 Break
+2783         End Select
+2784         '
+2785         Ovrd M_NOvrd                            'システムの初期値を設定
+2786         M_Out(12364) = 1                        'toPLC_データ保存ON
+2787         MRBTOpeGroupNo = 5
+2788         MRet = fnStepWrite(MRBTOpeGroupNo)      '初期位置の番号転送
+2789         Dly 1.0
+2790         M_Out(12364) = 0                        'toPLC_データ保存OFF
+2791         fnRoboPosChk = 1                        '初期位置動作実行
+2792         fnWindScreenOpen(MWindReSet,  0, 0, 10)  'ウィンド画面エラー表示とコメント設定
+2793     EndIf
+2794     Exit Function
+2795 FEnd
+2796 '
+2797 '■frInCheck
+2798 ''' <summary>
+2799 ''' センサーINチェック
+2800 ''' </summary>
+2801 '''<param name="MINNumber%">入力番号</param>
+2802 '''<param name="MCMPFLG%">0:OFF確認 1:ON確認</param>
+2803 '''<param name="MTimeCnt&">タイムアウト時間</param>
+2804 '''<returns>整数 0:タイムアウト 1:OK</returns>
+2805 ''' <remarks>
+2806 ''' Date   : 2021/07/07 : M.Hayakawa
+2807 ''' </remarks>
+2808 Function M% frInCheck(MINNumber%, MCMPFLG%, MTimeCnt&)
+2809     M_Timer(4) = 0
+2810     MloopFlg = 0
+2811     While MloopFlg = 0
+2812         MCrtTime& = M_Timer(4)
+2813         If M_In(MINNumber%) = MCMPFLG% Then
+2814             MloopFlg = 1
+2815             frInCheck = 1
+2816         ElseIf MCrtTime& > MTimeCnt& Then
+2817             MloopFlg = 1
+2818             frInCheck = 0
+2819         EndIf
+2820     WEnd
+2821 FEnd
+2822 '-----------------------------------------------
 2823 '
-2824 '22/09/29 Waitがタイムアウトできるよう修正(中村)
-2825 'fScewTFinish = 0　：正常終了
-2826 '          　 　-1 ：異常終了
-2827 '-----------------------------------------------
-2828 Function M% fScewTFinish
-2829 *ReCheckScewTFinish
-2830     fScewTFinish = 0
-2831     'ねじ締め完了待機を受信
-2832 '    Wait M_In(MIN_ScwT_Fin%) = MOn%
-2833     MRtn = fTimeOutJudge(MIN_ScwT_Fin%,MOn%)
-2834     If MRtn = 0 Then
-2835         fScewTFinish = -1
-2836     EndIf
-2837     If MRtn = 2 Then GoTo *ReCheckScewTFinish
-2838     If MRtn = 0 Then GoTo *ScewTFinish_ErrEnd
-2839     Dly 0.1
-2840     'ねじ締め完了受信を送信
-2841     M_Out(MOUT_ScwT_FinOK%) = MOn%
-2842     Dly 0.5                          'とりあえず保持時間0.5msec
-2843     'ねじ締め開始送信終了
-2844     M_Out(MOUT_ScwT_FinOK%) = MOff%
-2845     'Wait M_In(MTEST_KEY%) = MOn%
-2846     '
-2847 *ScewTFinish_ErrEnd
-2848 FEnd
+2824 'ねじ締め機通信確認
+2825 '
+2826 '22/09/29 Waitがタイムアウトできるよう修正(中村)
+2827 'fScrewTcomChk = 0　：正常終了
+2828 '          　 　 -1 ：異常終了
+2829 '-----------------------------------------------
+2830 Function M% fScrewTcomChk
+2831 *ReCheckScewTcomChk
+2832     fScrewTcomChk = 0
+2833     '通信確認送信
+2834     M_Out(MOUT_ScwT_ComChk%) = MOn%
+2835     '通信確認受信待機
+2836 '    Wait M_In(MIN_ScwT_comOK%) = MOn%
+2837     MRtn = fTimeOutJudge(MIN_ScwT_comOK%,MOn%)
+2838     '通信確認送信終了
+2839     M_Out(MOUT_ScwT_ComChk%) = MOff%
+2840     If MRtn = 0 Then
+2841         fScrewTcomChk = -1
+2842     EndIf
+2843     If MRtn = 2 Then GoTo *ReCheckScewTcomChk
+2844  '
+2845 FEnd
+2846 '
+2847 '
+2848 '-----------------------------------------------
 2849 '
-2850 '
-2851 '-----------------------------------------------
-2852 '
-2853 '条件xx停止受信
-2854 '
-2855 '22/09/29 Waitがタイムアウトできるよう修正(中村)
-2856 'fScewTCaseStop = 0　：正常終了
-2857 '          　   　-1 ：異常終了
-2858 '-----------------------------------------------
-2859 Function M% fScewTCaseStop(ByVal MCase%())
-2860 *ReCheckScewTCaseStop
-2861     fScewTCaseStop = 0
-2862     '条件xx停止を受信
-2863     Wait M_In(MCase%(1)) = MOn%
-2864     MRtn = fTimeOutJudge(MCase%(1),MOn%)
-2865     If MRtn = 0 Then
-2866         fScewTCaseStop = -1
-2867     EndIf
-2868     If MRtn = 2 Then GoTo *ReCheckScewTCaseStop
-2869     If MRtn = 0 Then GoTo *ScewTCaseStop_ErrEnd
-2870     Dly 0.1
-2871     '条件xx停止受信を送信
-2872     M_Out(MCase%(2)) = MOn%
-2873     Dly 0.5                          'とりあえず保持時間0.5msec
-2874     'ねじ締め開始送信終了
-2875     M_Out(MCase%(2)) = MOff%
-2876 *ScewTCaseStop_ErrEnd
-2877     '
-2878 FEnd
+2850 'ねじ締め開始送信
+2851 '
+2852 '22/09/29 Waitがタイムアウトできるよう修正(中村)
+2853 'fScrewTStart = 0　：正常終了
+2854 '           　　-1 ：異常終了
+2855 '-----------------------------------------------
+2856 Function M% fScrewTStart
+2857     fScrewTStart = 0
+2858     nRet% = 0
+2859     'ねじ締め開始待機を受信
+2860 '    Wait M_In(MIN_ScwT_STRec%) = MOn%
+2861     MRtn = frInCheck(MIN_ScwT_STRec%,MOn%,MSETTIMEOUT05&)
+2862     If MRtn = 0 Then nRet% = -1
+2863     If MRtn = 0 Then GoTo *ScrewStartERROR      '開始できなかった場合ジャンプ
+2864     Dly 0.1
+2865     'ねじ締め開始受信を送信
+2866     M_Out(MOUT_ScwT_ST%) = MOn%
+2867     Dly 0.5
+2868     'Wait M_In(MTEST_KEY%) = MOn%
+2869     'ねじ締め開始送信終了
+2870     M_Out(MOUT_ScwT_ST%) = MOff%
+2871     '
+2872 *ScrewStartERROR
+2873     fScrewTStart = nRet%
+2874 FEnd
+2875 '
+2876 '
+2877 '
+2878 '-----------------------------------------------
 2879 '
-2880 '■fScrewTighenRoboCheck
-2881 '<summary>
-2882 'ねじロボ監視
-2883 '</summary>
-2884 '<param name = "MStopNum%"> 停止番号</param>
-2885 '<returns>整数 0:ねじロボ異常終了 1:OK </returns>
-2886 '<make>
-2887 '2021/12/2 中村天哉
-2888 '</make>
-2889 Function M% fScrewTighenRoboCheck(ByVal MStopNum%)
-2890     fnAutoScreenComment(503)    '状態表示[ねじロボ動作終了待ち] 2022/04/26 渡辺
-2891     fScrewTighenRoboCheck = 1
-2892     MScrewTighenRoboFlg% = 1    'フラグの初期化
-2893     MCheck% = 0
-2894     While MScrewTighenRoboFlg% = 1
-2895         MCheck% = M_In16(11904)
-2896         If M_In(MStopNum%) = 1 Then '停止位置まで来たら
-2897             MScrewTighenRoboFlg% = 0 '関数を抜ける
-2898             fnAutoScreenComment(521)    '状態表示[６軸ロボ動作中] 2022/04/26 渡辺
-2899         EndIf
-2900         If MCheck% <> 0 Then
-2901             fScrewTighenRoboError(MCheck%)
-2902             Select M_20#
-2903                 Case MAbout%            '停止が押された場合
-2904                     M_Out(12869) = 1 Dly 1.0
-2905                     MScrewTighenRoboFlg% = 0
-2906                     fScrewTighenRoboCheck = 0   '異常終了
-2907                     Break
-2908                 Case MNgProcess%        'NGが押された場合
-2909                     M_Out(12873) = 1 Dly 1.0
-2910                     MScrewTighenRoboFlg% = 0
-2911                     fScrewTighenRoboCheck = 0   '異常終了
-2912                     Break
-2913                 Case MContinue%             'リトライが押された場合
-2914                     M_20# = MClear%         'M_20#初期化
-2915                     M_Out(12871) = 1 Dly 1.0
-2916                     Break
-2917                 Case MNext%                 '次へが押された場合
-2918                     M_20# = MClear%         'M_20#初期化
-2919                     M_Out(12874) = 1 Dly 1.0
-2920                     Break
-2921             End Select
-2922             Dly 0.5
-2923         EndIf
-2924     WEnd
-2925 FEnd
-2926 '
-2927 '■fScrewTighenRoboError
-2928 '<summary>
-2929 'ねじロボエラー処理
-2930 '</summary>
-2931 '<param name = "ErrorCode%"> エラー番号</param>
-2932 '<make>
-2933 '2021/12/2 中村天哉
-2934 '</make>
-2935 Function fScrewTighenRoboError(ByVal MErrorCode%)
-2936     MErrorScreenCode% = 0
-2937     MErrorScreenCode% = MErrorCode% + 300
-2938     fErrorProcess(11,MErrorScreenCode%,0,0)
-2939 FEnd
-2940 '
-2941 '■fErrorProcess
-2942 '<summary>
-2943 'エラー処理
-2944 '</summary>
-2945 '<param name = "MErrorScreenNo%"> スクリーン番号</param>
-2946 '<param name = "MErrorCommentD1001%"> D1001コメント番号 </param>
-2947 '<param name = "MErrorCommentD1002%"> D1002コメント番号 </param>
-2948 '<param name = "MErrorCommentD1003%"> D1003コメント番号 </param>
-2949 '<make>
-2950 '2021/11/5 中村天哉
-2951 '</make>
-2952 Function V fErrorProcess(ByVal MErrorScreenNo% , ByVal MErrorCommentD1001% , ByVal MErrorCommentD1002% , ByVal MErrorComentD1003)
-2953     MScreenNo = MErrorScreenNo%                    'エラースクリーン番号
-2954     MCommentD1001 = MErrorCommentD1001%            'D1001コメント番号
-2955     MCommentD1002 = MErrorCommentD1002%            'D1002コメント番号
-2956     MCommentD1003 = MErrorCommentD1003%            'D1003コメント番号
-2957 *RETRY_ERR_PROCESS
-2958      M_20# = MClear%     '初期化
-2959 '        'エラー処理記述
-2960         fnWindScreenOpen(MScreenNo , MCommentD1001, MCommentD1002, MCommentD1003)
-2961 '        'GOT KEY入力待ち
-2962         MKeyNumber = fnKEY_WAIT()
-2963 '        '
-2964         If MKeyNumber = MAbout% Then   '停止を選択した場合
-2965             M_20# = MAbout%            'M_20# プログラム間共通外部変数
-2966             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-2967             Break
-2968          '
-2969         ElseIf MKeyNumber = MContinue% Then   '継続を選択した場合
-2970             M_20# = MContinue%            'M_20# プログラム間共通外部変数
-2971             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-2972         '
-2973         ElseIf MKeyNumber = MNext% Then   '次へを選択した場合
-2974             M_20# = MNext%            'M_20# プログラム間共通外部変数
-2975             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-2976          '
-2977         ElseIf MKeyNumber = MNgProcess% Then   '停止を選択した場合
-2978             M_20# = MNgProcess%            'M_20# プログラム間共通外部変数
-2979             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-2980             Break
-2981         '
-2982         EndIf
-2983         '
-2984         If M_20# = MClear% Then *RETRY_ERR_PROCESS
-2985 FEnd
-2986 '
-2987 '■fnTorqueCheck
-2988 ''' <summary>
-2989 ''' トルクチェック動作用のメイン
-2990 ''' </summary>
-2991 ''' <remarks>
-2992 ''' Date   : 2021/12/21 : H.AJI
-2993 ''' </remarks>'
-2994 Function M% fnTorqueCheck
-2995     'トルクチェック中送信  搬送系停止
-2996     M_Out(MOUT_TORQUE_CHECK%) = 1     ' 12367  'PLCへトルクチェック中を送信
-2997     '
-2998     fnTorqueCheck = 0
-2999     Ovrd 20
-3000     Mov PInitialPosition              '初期位置移動
-3001     Ovrd 100
-3002     '下記キー待ちの継続に反応させないため
-3003     Wait M_In(11347) = 0                 'toRBT_継続の完了待ち
-3004     Dly 0.2
-3005     Wait M_In(11347) = 0                 'toRBT_継続の完了待ち　2重確認
-3006     '
-3007     'M6340  トルクチェック受信
-3008     'Dly 5.0
-3009     M_Out(12340) = 1          'トルクチェック受信 M6340
-3010     Dly 1.0
-3011     M_Out(12340) = 0
-3012     '
-3013     MRet = fnMainScreenOpen(11, 60, 61, 0)   'トルクチェック画面表示
-3014     M_Out(12835) = 1                         'ねじロボトルクチェック画面切替
-3015    Wait M_In(11843) = 1                         'ねじロボトルクチェック画面切替
-3016     M_Out(12835) = 0                         'ねじロボトルクチェック画面切替完了
-3017     '
-3018     '
-3019     MLoopFlg = 1
-3020     While MLoopFlg = 1
-3021         '
-3022         Mov PInitialPosition              '初期位置移動
-3023         '
-3024         MKeyNumber = fnKEY_WAIT()
-3025         Select MKeyNumber
-3026             Case Is = 1           '停止
-3027                 M_Out(12343) = 1          '停止要求開始要求受信 M6343
-3028                 Dly 1.0
-3029                 M_Out(12343) = 0
-3030                 Ovrd 20
-3031                 'Mov PTicketRead_1
-3032                 M_Out(12840) = 1          'トルクチェック終了
-3033                 Wait M_In(11859) = 1      'ねじロボからの終了
-3034                 M_Out(12840) = 0          'トルクチェック終了
-3035                 Ovrd 100
-3036                 M_20# = 1
-3037                 MLoopFlg = -1
-3038                 Break
-3039             Case Is = 2           '次へ
-3040                 Break
-3041             Case Is = 3           '継続
-3042                 Break
-3043             Case Is = 4           'トルクチェック開始
-3044                 M_Out(12342) = 1          'トルクチェック開始要求受信 M6342
-3045                 Dly 1.0
-3046                 M_Out(12342) = 0
-3047                 If M_In(11862) = 1 Then             'トルクチェッカー確認
-3048                     fnWindScreenOpen(29,  0, 0, 0)  'ウィンド画面エラー表示とコメント設定
-3049                     MRet = fnScrewMTorque()           'ねじロボ用トルクチェック
-3050                 EndIf
-3051                 'MRet = fnWindScreenOpen(MWindInfoScr,  0, 0, 67)  'ウィンド画面エラー表示とコメント設定
-3052                 'MRet = fnMoveTorquePosi()
-3053                 'MRet = fnAutoScreenComment(67)  'AUTO画面 通過履歴NG書込み
-3054                 'MRet = fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
-3055                 Break
-3056             Default
-3057                 Break
-3058         End Select
-3059     WEnd
-3060     '
-3061     'トルクチェック中停止送信
-3062     M_Out(MOUT_TORQUE_CHECK%) = 0     ' 12367  'PLCへトルクチェック中を送信
-3063     '
-3064     'ロボットの位置を元に戻す
-3065     '
-3066     '
-3067  FEnd
-3068  '
-3069 '
-3070 '
-3071 '---------------------------
-3072 '
-3073 '    メイン画面の表示、非表示設定
-3074 '         コメントD1001, D1002, D1003の設定
-3075 '           MWindReSet = 0     画面非表示
-3076 '           MWindInfoScr = 5   インフォメーション画面 D1003のみ
-3077 '           MWindErrScr = 10    エラー画面 D1001, D1002
-3078 '           MWindCmmnScr = 20   エラー以外のコメント画面 D1001, D1002
-3079 '
-3080 '---------------------------
-3081 Function M% fnMainScreenOpen(ByVal MScreenNo,  ByVal MCommentD1001, ByVal MCommentD1002, ByVal MCommentD1003)
-3082     fnMainScreenOpen = 0
-3083     '
-3084    If MCommentD1001 <> 0 Then                    'コメント 0 は設定がないので確認
-3085         M_Out16(12480) = MCommentD1001            'D1001 コメント
-3086     EndIf
-3087     '
-3088     If MCommentD1002 <> 0 Then                    'コメント 0 は設定がないので確認
-3089         M_Out16(12496) = MCommentD1002            'D1002 コメント
-3090     EndIf
-3091     '
-3092     If MCommentD1003 <> 0 Then                    'コメント 0 は設定がないので確認
-3093         M_Out16(12512) = MCommentD1003            'D1003 コメント
-3094     EndIf
-3095     '
-3096     M_Out16(12448) = MScreenNo                '画面番号  M6448   10=エラー画面
-3097     M_Out(12362) = 1                         'ウィンド画面設定  M6362
-3098     Dly 0.5
-3099     M_Out(12362) = 0                         'ウィンド画面設定
-3100 FEnd
-3101 '
-3102 '■Main
-3103 ''' <summary>
-3104 ''' トルクチェック実動作
-3105 ''' </summary>
-3106 ''' <remarks>
-3107 ''' Date   : 2021/12/21 : H.AJI
-3108 ''' </remarks>'
-3109 Function M% fnScrewMTorque
-3110     fnScrewMTorque = 0
-3111     M_Out(12838) = 1                         'トルクチェック開始1
-3112     Wait M_In(11857) = 1                     '受信完了
-3113     M_Out(12838) = 0                         'トルクチェック開始1
-3114     Dly 2.0
-3115 FEnd
-3116 '
-3117 '
-3118 '----------------------------------------------------------------
-3119 'fTimeOutJudge
-3120 '::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-3121 '引数
-3122 'Address% = 監視アドレス番号
-3123 'JudgeFlg% = 対象アドレスの正常終了時の値
-3124 '::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-3125 '戻り値 = 0 エラー
-3126 '         1 正常終了
-3127 '         2 リトライ
-3128 '::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-3129 '作成日
-3130 '2022/9/20 中村
-3131 '----------------------------------------------------------------
-3132 '
-3133 Function M% fTimeOutJudge(ByVal MAddress,ByVal MJudgeFlg)
-3134     fTimeOutJudge = 0
-3135     MJudge% = 1
-3136     MRtn = 0
-3137     M_20# = MClear%
-3138     MRtn = frInCheck(MAddress,MJudgeFlg,15000)
-3139 *TimeOutLoop
-3140     If MRtn = 1 Then GoTo *TimeOut
-3141         fErrorProcess(11,202,203,0)
-3142         If M_20# = MNext% Then GoTo *TimeOutLoop
-3143         If M_20# = MContinue% Then MJudge% = 2
-3144         If M_20# = MAbout% Then GoTo *JUDGE_ERROR_END
-3145 *TimeOut
-3146     fTimeOutJudge = MJudge%
-3147 '
-3148 *JUDGE_ERROR_END
-3149 FEnd
-3150 '■Main
-3151 ''' <summary>
-3152 ''' 組立動作用のメイン
-3153 ''' </summary>
-3154 ''' <remarks>
-3155 ''' Date   : 2021/07/07 : M.Hayakawa
-3156 ''' </remarks>'
-3157 Function Main
-3158     MopeNo = M_21#         '外部変数にて動作番号代入
-3159     '
-3160     If M_Svo=0 Then
-3161         Servo On
-3162     EndIf
-3163     Wait M_Svo=1
-3164 '組立スタート日付時刻要求パルスON
-3165     M_Out(MOUT_ST_DATETIME%) = 1 Dly 0.5
-3166 'パトライト操作
-3167     M_Out(MOUT_PATLIGHT_ON%) = 1                'PATLIGHT操作権ON
-3168     M_Out(MOUT_GREEN_LIGHT%) = 1                'PATLIGHT 青
-3169     '
-3170     M_20# = 0                                   'KEY入力初期化
-3171     M_Out(MOUT_OKNG%) = 0                       '後工程へNGフラグを出力初期化
-3172     MRet% = 0
-3173 '初期位置の確認と移動
+2880 'ねじ締め完了受信
+2881 '
+2882 '22/09/29 Waitがタイムアウトできるよう修正(中村)
+2883 'fScewTFinish = 0　：正常終了
+2884 '          　 　-1 ：異常終了
+2885 '-----------------------------------------------
+2886 Function M% fScewTFinish
+2887 *ReCheckScewTFinish
+2888     fScewTFinish = 0
+2889     'ねじ締め完了待機を受信
+2890 '    Wait M_In(MIN_ScwT_Fin%) = MOn%
+2891     MRtn = fTimeOutJudge(MIN_ScwT_Fin%,MOn%)
+2892     If MRtn = 0 Then
+2893         fScewTFinish = -1
+2894     EndIf
+2895     If MRtn = 2 Then GoTo *ReCheckScewTFinish
+2896     If MRtn = 0 Then GoTo *ScewTFinish_ErrEnd
+2897     Dly 0.1
+2898     'ねじ締め完了受信を送信
+2899     M_Out(MOUT_ScwT_FinOK%) = MOn%
+2900     Dly 0.5                          'とりあえず保持時間0.5msec
+2901     'ねじ締め開始送信終了
+2902     M_Out(MOUT_ScwT_FinOK%) = MOff%
+2903     'Wait M_In(MTEST_KEY%) = MOn%
+2904     '
+2905 *ScewTFinish_ErrEnd
+2906 FEnd
+2907 '
+2908 '
+2909 '-----------------------------------------------
+2910 '
+2911 '条件xx停止受信
+2912 '
+2913 '22/09/29 Waitがタイムアウトできるよう修正(中村)
+2914 'fScewTCaseStop = 0　：正常終了
+2915 '          　   　-1 ：異常終了
+2916 '-----------------------------------------------
+2917 Function M% fScewTCaseStop(ByVal MCase%())
+2918 *ReCheckScewTCaseStop
+2919     fScewTCaseStop = 0
+2920     '条件xx停止を受信
+2921     Wait M_In(MCase%(1)) = MOn%
+2922     MRtn = fTimeOutJudge(MCase%(1),MOn%)
+2923     If MRtn = 0 Then
+2924         fScewTCaseStop = -1
+2925     EndIf
+2926     If MRtn = 2 Then GoTo *ReCheckScewTCaseStop
+2927     If MRtn = 0 Then GoTo *ScewTCaseStop_ErrEnd
+2928     Dly 0.1
+2929     '条件xx停止受信を送信
+2930     M_Out(MCase%(2)) = MOn%
+2931     Dly 0.5                          'とりあえず保持時間0.5msec
+2932     'ねじ締め開始送信終了
+2933     M_Out(MCase%(2)) = MOff%
+2934 *ScewTCaseStop_ErrEnd
+2935     '
+2936 FEnd
+2937 '
+2938 '■fScrewTighenRoboCheck
+2939 '<summary>
+2940 'ねじロボ監視
+2941 '</summary>
+2942 '<param name = "MStopNum%"> 停止番号</param>
+2943 '<returns>整数 0:ねじロボ異常終了 1:OK </returns>
+2944 '<make>
+2945 '2021/12/2 中村天哉
+2946 '</make>
+2947 Function M% fScrewTighenRoboCheck(ByVal MStopNum%)
+2948     fnAutoScreenComment(503)    '状態表示[ねじロボ動作終了待ち] 2022/04/26 渡辺
+2949     fScrewTighenRoboCheck = 1
+2950     MScrewTighenRoboFlg% = 1    'フラグの初期化
+2951     MCheck% = 0
+2952     While MScrewTighenRoboFlg% = 1
+2953         MCheck% = M_In16(11904)
+2954         If M_In(MStopNum%) = 1 Then '停止位置まで来たら
+2955             MScrewTighenRoboFlg% = 0 '関数を抜ける
+2956             fnAutoScreenComment(521)    '状態表示[６軸ロボ動作中] 2022/04/26 渡辺
+2957         EndIf
+2958         If MCheck% <> 0 Then
+2959             fScrewTighenRoboError(MCheck%)
+2960             Select M_20#
+2961                 Case MAbout%            '停止が押された場合
+2962                     M_Out(12869) = 1 Dly 1.0
+2963                     MScrewTighenRoboFlg% = 0
+2964                     fScrewTighenRoboCheck = 0   '異常終了
+2965                     Break
+2966                 Case MNgProcess%        'NGが押された場合
+2967                     M_Out(12873) = 1 Dly 1.0
+2968                     MScrewTighenRoboFlg% = 0
+2969                     fScrewTighenRoboCheck = 0   '異常終了
+2970                     Break
+2971                 Case MContinue%             'リトライが押された場合
+2972                     M_20# = MClear%         'M_20#初期化
+2973                     M_Out(12871) = 1 Dly 1.0
+2974                     Break
+2975                 Case MNext%                 '次へが押された場合
+2976                     M_20# = MClear%         'M_20#初期化
+2977                     M_Out(12874) = 1 Dly 1.0
+2978                     Break
+2979             End Select
+2980             Dly 0.5
+2981         EndIf
+2982     WEnd
+2983 FEnd
+2984 '
+2985 '■fScrewTighenRoboError
+2986 '<summary>
+2987 'ねじロボエラー処理
+2988 '</summary>
+2989 '<param name = "ErrorCode%"> エラー番号</param>
+2990 '<make>
+2991 '2021/12/2 中村天哉
+2992 '</make>
+2993 Function fScrewTighenRoboError(ByVal MErrorCode%)
+2994     MErrorScreenCode% = 0
+2995     MErrorScreenCode% = MErrorCode% + 300
+2996     fErrorProcess(11,MErrorScreenCode%,0,0)
+2997 FEnd
+2998 '
+2999 '■fErrorProcess
+3000 '<summary>
+3001 'エラー処理
+3002 '</summary>
+3003 '<param name = "MErrorScreenNo%"> スクリーン番号</param>
+3004 '<param name = "MErrorCommentD1001%"> D1001コメント番号 </param>
+3005 '<param name = "MErrorCommentD1002%"> D1002コメント番号 </param>
+3006 '<param name = "MErrorCommentD1003%"> D1003コメント番号 </param>
+3007 '<make>
+3008 '2021/11/5 中村天哉
+3009 '</make>
+3010 Function V fErrorProcess(ByVal MErrorScreenNo% , ByVal MErrorCommentD1001% , ByVal MErrorCommentD1002% , ByVal MErrorComentD1003)
+3011     MScreenNo = MErrorScreenNo%                    'エラースクリーン番号
+3012     MCommentD1001 = MErrorCommentD1001%            'D1001コメント番号
+3013     MCommentD1002 = MErrorCommentD1002%            'D1002コメント番号
+3014     MCommentD1003 = MErrorCommentD1003%            'D1003コメント番号
+3015 *RETRY_ERR_PROCESS
+3016      M_20# = MClear%     '初期化
+3017 '        'エラー処理記述
+3018         fnWindScreenOpen(MScreenNo , MCommentD1001, MCommentD1002, MCommentD1003)
+3019 '        'GOT KEY入力待ち
+3020         MKeyNumber = fnKEY_WAIT()
+3021 '        '
+3022         If MKeyNumber = MAbout% Then   '停止を選択した場合
+3023             M_20# = MAbout%            'M_20# プログラム間共通外部変数
+3024             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+3025             Break
+3026          '
+3027         ElseIf MKeyNumber = MContinue% Then   '継続を選択した場合
+3028             M_20# = MContinue%            'M_20# プログラム間共通外部変数
+3029             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+3030         '
+3031         ElseIf MKeyNumber = MNext% Then   '次へを選択した場合
+3032             M_20# = MNext%            'M_20# プログラム間共通外部変数
+3033             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+3034          '
+3035         ElseIf MKeyNumber = MNgProcess% Then   '停止を選択した場合
+3036             M_20# = MNgProcess%            'M_20# プログラム間共通外部変数
+3037             fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+3038             Break
+3039         '
+3040         EndIf
+3041         '
+3042         If M_20# = MClear% Then *RETRY_ERR_PROCESS
+3043 FEnd
+3044 '
+3045 '■fnTorqueCheck
+3046 ''' <summary>
+3047 ''' トルクチェック動作用のメイン
+3048 ''' </summary>
+3049 ''' <remarks>
+3050 ''' Date   : 2021/12/21 : H.AJI
+3051 ''' </remarks>'
+3052 Function M% fnTorqueCheck
+3053     'トルクチェック中送信  搬送系停止
+3054     M_Out(MOUT_TORQUE_CHECK%) = 1     ' 12367  'PLCへトルクチェック中を送信
+3055     '
+3056     fnTorqueCheck = 0
+3057     Ovrd 20
+3058     Mov PInitialPosition              '初期位置移動
+3059     Ovrd 100
+3060     '下記キー待ちの継続に反応させないため
+3061     Wait M_In(11347) = 0                 'toRBT_継続の完了待ち
+3062     Dly 0.2
+3063     Wait M_In(11347) = 0                 'toRBT_継続の完了待ち　2重確認
+3064     '
+3065     'M6340  トルクチェック受信
+3066     'Dly 5.0
+3067     M_Out(12340) = 1          'トルクチェック受信 M6340
+3068     Dly 1.0
+3069     M_Out(12340) = 0
+3070     '
+3071     MRet = fnMainScreenOpen(11, 60, 61, 0)   'トルクチェック画面表示
+3072     M_Out(12835) = 1                         'ねじロボトルクチェック画面切替
+3073    Wait M_In(11843) = 1                         'ねじロボトルクチェック画面切替
+3074     M_Out(12835) = 0                         'ねじロボトルクチェック画面切替完了
+3075     '
+3076     '
+3077     MLoopFlg = 1
+3078     While MLoopFlg = 1
+3079         '
+3080         Mov PInitialPosition              '初期位置移動
+3081         '
+3082         MKeyNumber = fnKEY_WAIT()
+3083         Select MKeyNumber
+3084             Case Is = 1           '停止
+3085                 M_Out(12343) = 1          '停止要求開始要求受信 M6343
+3086                 Dly 1.0
+3087                 M_Out(12343) = 0
+3088                 Ovrd 20
+3089                 'Mov PTicketRead_1
+3090                 M_Out(12840) = 1          'トルクチェック終了
+3091                 Wait M_In(11859) = 1      'ねじロボからの終了
+3092                 M_Out(12840) = 0          'トルクチェック終了
+3093                 Ovrd 100
+3094                 M_20# = 1
+3095                 MLoopFlg = -1
+3096                 Break
+3097             Case Is = 2           '次へ
+3098                 Break
+3099             Case Is = 3           '継続
+3100                 Break
+3101             Case Is = 4           'トルクチェック開始
+3102                 M_Out(12342) = 1          'トルクチェック開始要求受信 M6342
+3103                 Dly 1.0
+3104                 M_Out(12342) = 0
+3105                 If M_In(11862) = 1 Then             'トルクチェッカー確認
+3106                     fnWindScreenOpen(29,  0, 0, 0)  'ウィンド画面エラー表示とコメント設定
+3107                     MRet = fnScrewMTorque()           'ねじロボ用トルクチェック
+3108                 EndIf
+3109                 'MRet = fnWindScreenOpen(MWindInfoScr,  0, 0, 67)  'ウィンド画面エラー表示とコメント設定
+3110                 'MRet = fnMoveTorquePosi()
+3111                 'MRet = fnAutoScreenComment(67)  'AUTO画面 通過履歴NG書込み
+3112                 'MRet = fnWindScreenOpen(MWindReSet, 0, 0, 0)  'エラー画面消去
+3113                 Break
+3114             Default
+3115                 Break
+3116         End Select
+3117     WEnd
+3118     '
+3119     'トルクチェック中停止送信
+3120     M_Out(MOUT_TORQUE_CHECK%) = 0     ' 12367  'PLCへトルクチェック中を送信
+3121     '
+3122     'ロボットの位置を元に戻す
+3123     '
+3124     '
+3125  FEnd
+3126  '
+3127 '
+3128 '
+3129 '---------------------------
+3130 '
+3131 '    メイン画面の表示、非表示設定
+3132 '         コメントD1001, D1002, D1003の設定
+3133 '           MWindReSet = 0     画面非表示
+3134 '           MWindInfoScr = 5   インフォメーション画面 D1003のみ
+3135 '           MWindErrScr = 10    エラー画面 D1001, D1002
+3136 '           MWindCmmnScr = 20   エラー以外のコメント画面 D1001, D1002
+3137 '
+3138 '---------------------------
+3139 Function M% fnMainScreenOpen(ByVal MScreenNo,  ByVal MCommentD1001, ByVal MCommentD1002, ByVal MCommentD1003)
+3140     fnMainScreenOpen = 0
+3141     '
+3142    If MCommentD1001 <> 0 Then                    'コメント 0 は設定がないので確認
+3143         M_Out16(12480) = MCommentD1001            'D1001 コメント
+3144     EndIf
+3145     '
+3146     If MCommentD1002 <> 0 Then                    'コメント 0 は設定がないので確認
+3147         M_Out16(12496) = MCommentD1002            'D1002 コメント
+3148     EndIf
+3149     '
+3150     If MCommentD1003 <> 0 Then                    'コメント 0 は設定がないので確認
+3151         M_Out16(12512) = MCommentD1003            'D1003 コメント
+3152     EndIf
+3153     '
+3154     M_Out16(12448) = MScreenNo                '画面番号  M6448   10=エラー画面
+3155     M_Out(12362) = 1                         'ウィンド画面設定  M6362
+3156     Dly 0.5
+3157     M_Out(12362) = 0                         'ウィンド画面設定
+3158 FEnd
+3159 '
+3160 '■Main
+3161 ''' <summary>
+3162 ''' トルクチェック実動作
+3163 ''' </summary>
+3164 ''' <remarks>
+3165 ''' Date   : 2021/12/21 : H.AJI
+3166 ''' </remarks>'
+3167 Function M% fnScrewMTorque
+3168     fnScrewMTorque = 0
+3169     M_Out(12838) = 1                         'トルクチェック開始1
+3170     Wait M_In(11857) = 1                     '受信完了
+3171     M_Out(12838) = 0                         'トルクチェック開始1
+3172     Dly 2.0
+3173 FEnd
 3174 '
-3175 '復帰動作　実行・未実行判別      2022/04/08 渡辺 作成
-3176     PActive = P_Curr                    '現在位置を取得
-3177     MRecoveryPass% = 0
-3178     If (PActive.X <= PInitialPosition.X + 1.0) And (PActive.X >= PInitialPosition.X -1.0) Then
-3179         If (PActive.Y <= PInitialPosition.Y + 1.0) And (PActive.Y >= PInitialPosition.Y -1.0) Then
-3180             If (PActive.Z <= PInitialPosition.Z + 1.0) And (PActive.Z >= PInitialPosition.Z -1.0) Then
-3181                 MRecoveryPass% = 1       'イニシャルポジションは復帰動作パス
-3182             EndIf
-3183         EndIf
-3184     EndIf
-3185     If (PActive.X <= PTicketRead_1.X + 1.0) And (PActive.X >= PTicketRead_1.X -1.0) Then
-3186         If (PActive.Y <= PTicketRead_1.Y + 1.0) And (PActive.Y >= PTicketRead_1.Y -1.0) Then
-3187             If (PActive.Z <= PTicketRead_1.Z + 1.0) And (PActive.Z >= PTicketRead_1.Z -1.0) Then
-3188                 MRecoveryPass% = 1       'チケット読み込み上空位置は復帰動作パス
-3189             EndIf
-3190         EndIf
-3191     EndIf
-3192     If MRecoveryPass% = 0 Then
-3193        fnInitialZoneB()        '復帰動作パスフラグが立っていない時は復帰動作を実行
-3194     EndIf
-3195 '
-3196     If M_20# <> MAbout% Then        '外部変数 M_20# が 1=停止 以外の場合
-3197         M_Out(12364) = 1            'toPLC_データ保存ON
-3198 'トルクチェック
-3199         If MopeNo = 2 Or M_In(MIN_TorqueCheck%) = 1 Then
-3200             MRet% = fnTorqueCheck()
-3201             Break
-3202         Else
-3203 '            If M_In(MIN_Insight_Use%) = 1 Then  'toRBT_使用確認
-3204 '                MRtn = InspInit()               '画像処理初期化処理
-3205 '            EndIf
-3206 '
-3207             M_20# = MClear%             '初期化
-3208 '組立開始
-3209             If M_In(MIN_ASSY_CANCEL%) = 0 Then
-3210                 fnAssyStart()
-3211             Else
-3212                 M_20# = MPass%
-3213             EndIf
-3214 '組立終了日付時刻
-3215             M_Out(MOUT_ED_DATETIME%) = 1    '組立終了日付時刻
-3216             Wait M_In(11572) = 1            '日付取得完了
-3217             Dly 0.1
-3218             M_Out(MOUT_ED_DATETIME%) = 0    '組立終了日付時刻
-3219 'リフターユニットへのOUT
-3220             '  KEY入力が何もない場合 OKと判断
-3221             fnAutoScreenComment(89)         'AUTO画面 組立処理完了
-3222             'MRet% = fnWindScreenOpen(MWindReSet, 0, 0, 89)  'AUTO画面 組立処理完了
-3223 'OK/NGフラグ出力
-3224             If M_20# <= 0 Then
-3225                 M_Out(MOUT_OKNG%) = 1       '後工程へOKフラグを出力(PLC OUT)
-3226             ElseIf M_20# = MPass% Then
-3227                 M_Out(MOUT_OKNG%) = 0       '後工程へNGフラグを出力(PLC OUT)
-3228             EndIf
-3229 'PIASに組立完了書込み
-3230             If M_In(MIN_PIAS_Use%) = 1 Then       'PIAS_ON確認
-3231                 If M_20# = MPass% Then
-3232                     M_Out(MOUT_OKNG%) = 0                   '後工程へNGフラグを出力(PLC OUT)
-3233                 Else
-3234                     'KEY入力がNGの場合
-3235                     If M_20# = MNgProcess% Then
-3236                         M_Out(MOUT_OKNG%) = 0                   '後工程へNGフラグを出力(PLC OUT)
-3237                         fnAutoScreenComment(90)  'AUTO画面 通過履歴NG書込み
-3238                         MRet% = fnPiasWrite(MNG%)
-3239                        nAssyNgQty = nAssyNgQty + 1
-3240                     EndIf
-3241                     '
-3242                     'KEY入力が何もない場合 OKと判断(MAssyOK%に変更1/17中村)
-3243                     If M_20# = MAssyOK% Then
-3244                             '-----------------------
-3245                             'D732 -> D2600 コピー要求
-3246                             M_Out(12566) = 1
-3247 '                            Wait M_In(11581) = 1   'PLCよりコピー完了信号
-3248                             M_Out(12566) = 0
-3249                             '
-3250                         If M_In(11367) = 0 Then          '基板履歴書込みキャンセル=1 DEbug用
-3251                             'MRet% = fnAutoScreenComment(91)  'AUTO画面 基板情報書込み
-3252                             '基板番号照合(PPは未使用）
-3253 '                            MRet% = fnPCBNumberCheck()
-3254                         Else
-3255                             MRet% = 1
-3256                         EndIf
-3257                         '
-3258                         If M_In(11368) = 0 Then          '工程履歴書込みキャンセル=1 DEbug用
-3259                             If M_20# <> MAbout% Then
-3260                                 '工程履歴OK書き込み
-3261                                 M_Out(MOUT_OKNG%) = 1                   '後工程へOKフラグを出力(PLC OUT)
-3262                                 fnAutoScreenComment(92)  'AUTO画面 通過履歴OK書込み
-3263                                 MRet% = fnPiasWrite(MOK%)
-3264                                 nAssyOkQty = 0
-3265                                 nAssyOkQty = nAssyOkQty + 1
-3266                             Else
-3267                                 nAssyOkQty = nAssyOkQty + 1
-3268                             EndIf
-3269                         EndIf
-3270                     EndIf
-3271 '                    fnAutoScreenComment(92)  'AUTO画面 通過履歴OK書込み
-3272 '                    MRet% = fnPiasWrite(MOK%)
-3273                 EndIf
-3274             Else
-3275                 nAssyOkQty = nAssyOkQty + 1
-3276             EndIf
-3277             '
-3278             '組立終了日付時刻解除
-3279             M_Out(MOUT_ED_DATETIME%) = 0                '組立終了日付時刻
-3280             '投入数、組立OK数、組立NG数書込み
-3281 '            MRtn = FnCtlValue2(2)                       '書込み 2022/04/28 コメントアウト 渡辺
-3282             '
-3283 '            If M_In(MIN_Insight_Use%) = 1 Then          'toRBT_使用確認
-3284 '                '画像処理終了処理
-3285 '                MRtn = InspQuit()
-3286 '            EndIf
-3287         EndIf
-3288         M_Out(12364) = 0                          'toPLC_データ保存OFF
-3289     EndIf
-3290 'パトライト操作
-3291     M_Out(MOUT_PATLIGHT_ON%) = 0                  'PATLIGHT操作権ON
-3292     M_Out(MOUT_GREEN_LIGHT%) = 0                  'PATLIGHT 青
-3293 'GOT表示
-3294     fnAutoScreenComment(93)  'AUTO画面 工程完了
-3295 FEnd
-3296 End
-3297 '
-3298 'おまじないコメント
-3299 '絶対削除するな
-3300 '
-3301 '
-3302 '
-3303 '
-3304 '
-3305 '
-3306 '
-PInspPosition(1)=(+602.00,-150.00,+500.00,+180.00,+0.00,+90.00,+0.00,+0.00)(7,0)
-PInspPosition(2)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(3)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(4)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(5)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(6)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(7)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(8)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(9)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(10)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(11)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(12)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(13)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(14)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(15)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(16)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(17)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(18)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(19)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(20)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(21)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(22)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(23)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(24)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(25)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(26)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(27)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(28)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(29)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PInspPosition(30)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PTemp=(+602.00,-150.00,+550.00,-180.00,+0.00,+90.00,+0.00,+0.00)(7,0)
-PScrewPos(1)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PScrewPos(2)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PScrewPos(3)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PScrewPos(4)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PScrewPos(5)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PScrewPos(6)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PScrewPos(7)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PScrewPos(8)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PScrewPos(9)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PScrewPos(10)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(1)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(2)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(3)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(4)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(5)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(6)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(7)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(8)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(9)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PGetScrewPos(10)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(1)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(2)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(3)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(4)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(5)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(6)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(7)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(8)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(9)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PEscapePosi(10)=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(,)
-PActive=(+602.00,-150.00,+550.00,-180.00,+0.00,+90.00,+0.00,+0.00)(7,0)
-Pmove=(-17.62,+286.22,+640.00,-179.82,-0.29,+90.49,+0.00,+0.00)(7,1048576)
-PInitialPosition=(+340.00,+0.00,+580.00,-180.00,+0.00,+180.00)(7,0)
-PMechaGet=(-415.66,-8.74,+299.32,+179.45,-2.22,+176.86)(7,1048577)
-PMechaGet_1=(-415.66,-8.74,+409.96,+179.45,-2.22,+176.86)(7,1048577)
-PMechaGet_2=(-189.84,-0.01,+629.06,-180.00,+0.00,-179.99)(7,1)
-PMechaGet_3=(+0.01,+189.84,+629.07,-180.00,+0.00,+90.00)(7,0)
-PMechaGet_4=(+327.50,+0.02,+596.24,-179.99,+0.00,+103.50)(7,0)
-PMechaGet_5=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PMechaGet_6=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PMechaSet1=(+159.80,-334.91,+320.00,+122.02,+86.64,+31.39)(6,0)
-PMechaSet1_1=(+159.80,-334.91,+340.00,+122.02,+86.64,+31.39)(6,0)
-PMechaSet2=(+160.19,-334.97,+320.18,+122.02,+86.64,+31.36)(6,0)
-PMechaSet2_1=(+160.19,-334.97,+339.97,+122.02,+86.64,+31.36)(6,0)
-PMechaSet_2=(+162.58,-305.37,+557.38,+179.47,+90.00,+89.47)(6,0)
-PMechaSet_3=(+114.45,-288.22,+565.58,+180.00,+0.00,+112.11)(7,0)
-PMechaSet_4=(+310.11,-0.04,+565.56,+180.00,+0.00,-179.55)(7,0)
-PMechaSet_5=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PMechaSet_6=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PPlateBackCheck=(-90.21,+513.03,+577.72,-180.00,+0.00,-90.00)(7,0)
-PPlateBackCheck_2=(+66.39,+429.86,+577.75,+180.00,+0.00,-90.00)(7,0)
-PPlateBackCheck_3=(-18.78,+286.22,+630.88,+180.00,+0.00,-90.00)(7,0)
-PPlateBackCheck_4=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PPlateBackCheck_5=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PPlateBackCheck_6=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PPlateBackGet=(+477.48,+103.78,+401.13,+179.78,+0.01,+178.57)(7,0)
-PPlateBackGet_1=(+477.48,+103.78,+430.00,+179.78,+0.01,+178.57)(7,0)
-PPlateBackGet_2=(+477.48,+103.78,+560.00,+179.78,+0.01,+178.57)(7,0)
-PPlateBackGet_3=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PPlateBackGet_4=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PPlateBackGet_5=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PPlateBackGet_6=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PPlateBackSet=(-18.00,+492.33,+543.82,-179.86,-0.33,+89.00)(7,1048576)
-PPlateBackSet_1=(-18.00,+446.52,+535.30,-179.37,-13.97,+88.96)(7,1048576)
-PPlateBackSet_10=(-18.77,+363.66,+487.69,-179.91,-41.20,+90.53)(7,1048576)
-PPlateBackSet_11=(-18.77,+362.28,+493.38,+179.84,-39.34,+90.58)(7,1048576)
-PPlateBackSet_12=(-17.62,+286.22,+630.90,-179.82,-0.29,+90.49)(7,1048576)
-PPlateBackSet_2=(-18.00,+402.05,+517.82,-179.10,-27.37,+88.87)(7,1048576)
-PPlateBackSet_3=(-18.00,+376.88,+500.39,-178.89,-36.13,+88.75)(7,1048576)
-PPlateBackSet_4=(-18.83,+358.54,+485.67,-179.10,-42.67,+88.56)(7,1048576)
-PPlateBackSet_5=(-18.90,+355.89,+483.22,-179.10,-42.67,+88.56)(7,1048576)
-PPlateBackSet_6=(-18.90,+352.51,+487.90,-179.10,-42.67,+88.56)(7,1048576)
-PPlateBackSet_7=(-18.83,+378.77,+503.51,+179.34,-35.63,+90.89)(7,1048576)
-PPlateBackSet_8=(-18.81,+374.94,+499.62,+179.31,-36.77,+90.90)(7,1048576)
-PPlateBackSet_9=(-18.81,+372.36,+496.87,+179.85,-37.92,+90.58)(7,1048576)
-PProductOnPltGet=(+479.30,-99.28,+372.11,+179.79,-0.35,+178.62)(7,0)
-PProductOnPltGet_1=(+479.30,-99.28,+410.00,+179.79,-0.35,+178.62)(7,0)
-PProductOnPltGet_2=(+479.30,-99.28,+500.00,+179.79,-0.35,+178.62)(7,0)
-PProductOnPltGet_3=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnPltGet_4=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnPltGet_5=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnPltGet_6=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnPltSet=(+478.90,-98.88,+372.11,+179.79,-0.35,+178.62)(7,0)
-PProductOnPltSet_1=(+478.90,-98.88,+410.00,+179.79,-0.35,+178.62)(7,0)
-PProductOnPltSet_2=(+478.90,-98.88,+500.00,+179.79,-0.35,+178.62)(7,0)
-PProductOnPltSet_3=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnPltSet_4=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnPltSet_5=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnPltSet_6=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnRoboGet=(-18.40,+403.83,+318.61,+75.41,+88.78,+165.60)(6,0)
-PProductOnRoboGet_1=(-18.40,+403.83,+425.20,+75.41,+88.78,+165.60)(6,0)
-PProductOnRoboGet_2=(-18.40,+370.97,+425.20,+75.41,+88.78,+165.60)(6,0)
-PProductOnRoboGet_3=(-18.40,+300.00,+550.00,+75.41,+88.78,+165.60)(6,0)
-PProductOnRoboGet_4=(-18.40,+300.00,+550.00,+75.41,+88.78,+165.60)(6,0)
-PProductOnRoboGet_5=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnRoboGet_6=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnRoboSet=(-18.40,+403.83,+318.61,+75.41,+88.78,+165.60)(6,0)
-PProductOnRoboSet_1=(-18.40,+403.83,+425.20,+75.41,+88.78,+165.60)(6,0)
-PProductOnRoboSet_2=(-18.40,+370.97,+425.20,+75.41,+88.78,+165.60)(6,0)
-PProductOnRoboSet_3=(-18.40,+300.00,+550.00,+75.41,+88.78,+165.60)(6,0)
-PProductOnRoboSet_4=(-18.86,+404.69,+360.00,-102.74,+89.08,-12.36)(6,0)
-PProductOnRoboSet_5=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PProductOnRoboSet_6=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PPushTilt=(-213.31,+564.75,+464.13,+179.96,-0.02,+1.51)(7,0)
-PPushTilt_1=(-213.31,+564.75,+480.78,+179.96,-0.02,+1.51)(7,0)
-PPushTilt_2=(-213.31,+564.75,+620.00,+179.96,-0.02,+1.51)(7,0)
-PPushTilt_3=(+0.02,+340.00,+610.00,-180.00,-0.01,-91.91)(7,0)
-PTicketRead=(+602.00,-150.00,+500.00,+180.00,+0.00,+90.00)(7,0)
-PTicketRead_1=(+602.00,-150.00,+550.00,+180.00,+0.00,+90.00)(7,0)
-PTicketRead_2=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PTicketRead_3=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PTicketRead_4=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PTicketRead_5=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-PTicketRead_6=(+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00,+0.00)(0,0)
-JActive=(+93.47,-14.83,+113.09,+0.17,+81.44,+182.96,+0.00,+0.00)
-Jmove=(+93.47,-46.87,+111.64,+0.00,+80.58,+182.96,+0.00,+0.00)
-JTaihi=(+0.00,-46.87,+111.64,+0.00,+80.58,+0.00,+0.00,+0.00)
+3175 '
+3176 '----------------------------------------------------------------
+3177 'fTimeOutJudge
+3178 '::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+3179 '引数
+3180 'Address% = 監視アドレス番号
+3181 'JudgeFlg% = 対象アドレスの正常終了時の値
+3182 '::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+3183 '戻り値 = 0 エラー
+3184 '         1 正常終了
+3185 '         2 リトライ
+3186 '::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+3187 '作成日
+3188 '2022/9/20 中村
+3189 '----------------------------------------------------------------
+3190 '
+3191 Function M% fTimeOutJudge(ByVal MAddress,ByVal MJudgeFlg)
+3192     fTimeOutJudge = 0
+3193     MJudge% = 1
+3194     MRtn = 0
+3195     M_20# = MClear%
+3196     MRtn = frInCheck(MAddress,MJudgeFlg,15000)
+3197 *TimeOutLoop
+3198     If MRtn = 1 Then GoTo *TimeOut
+3199         fErrorProcess(11,202,203,0)
+3200         If M_20# = MNext% Then GoTo *TimeOutLoop
+3201         If M_20# = MContinue% Then MJudge% = 2
+3202         If M_20# = MAbout% Then GoTo *JUDGE_ERROR_END
+3203 *TimeOut
+3204     fTimeOutJudge = MJudge%
+3205 '
+3206 *JUDGE_ERROR_END
+3207 FEnd
+3208 '■Main
+3209 ''' <summary>
+3210 ''' 組立動作用のメイン
+3211 ''' </summary>
+3212 ''' <remarks>
+3213 ''' Date   : 2021/07/07 : M.Hayakawa
+3214 ''' </remarks>'
+3215 Function Main
+3216     MopeNo = M_21#         '外部変数にて動作番号代入
+3217     '
+3218     If M_Svo=0 Then
+3219         Servo On
+3220     EndIf
+3221     Wait M_Svo=1
+3222 '組立スタート日付時刻要求パルスON
+3223     M_Out(MOUT_ST_DATETIME%) = 1 Dly 0.5
+3224 'パトライト操作
+3225     M_Out(MOUT_PATLIGHT_ON%) = 1                'PATLIGHT操作権ON
+3226     M_Out(MOUT_GREEN_LIGHT%) = 1                'PATLIGHT 青
+3227     '
+3228     M_20# = 0                                   'KEY入力初期化
+3229     M_Out(MOUT_OKNG%) = 0                       '後工程へNGフラグを出力初期化
+3230     MRet% = 0
+3231 '初期位置の確認と移動
+3232 '
+3233 '復帰動作　実行・未実行判別      2022/04/08 渡辺 作成
+3234     PActive = P_Curr                    '現在位置を取得
+3235     MRecoveryPass% = 0
+3236     If (PActive.X <= PInitialPosition.X + 1.0) And (PActive.X >= PInitialPosition.X -1.0) Then
+3237         If (PActive.Y <= PInitialPosition.Y + 1.0) And (PActive.Y >= PInitialPosition.Y -1.0) Then
+3238             If (PActive.Z <= PInitialPosition.Z + 1.0) And (PActive.Z >= PInitialPosition.Z -1.0) Then
+3239                 MRecoveryPass% = 1       'イニシャルポジションは復帰動作パス
+3240             EndIf
+3241         EndIf
+3242     EndIf
+3243     If (PActive.X <= PTicketRead_1.X + 1.0) And (PActive.X >= PTicketRead_1.X -1.0) Then
+3244         If (PActive.Y <= PTicketRead_1.Y + 1.0) And (PActive.Y >= PTicketRead_1.Y -1.0) Then
+3245             If (PActive.Z <= PTicketRead_1.Z + 1.0) And (PActive.Z >= PTicketRead_1.Z -1.0) Then
+3246                 MRecoveryPass% = 1       'チケット読み込み上空位置は復帰動作パス
+3247             EndIf
+3248         EndIf
+3249     EndIf
+3250     If MRecoveryPass% = 0 Then
+3251        fnInitialZoneB()        '復帰動作パスフラグが立っていない時は復帰動作を実行
+3252     EndIf
+3253 '
+3254     If M_20# <> MAbout% Then        '外部変数 M_20# が 1=停止 以外の場合
+3255         M_Out(12364) = 1            'toPLC_データ保存ON
+3256 'トルクチェック
+3257         If MopeNo = 2 Or M_In(MIN_TorqueCheck%) = 1 Then
+3258             MRet% = fnTorqueCheck()
+3259             Break
+3260         Else
+3261 '            If M_In(MIN_Insight_Use%) = 1 Then  'toRBT_使用確認
+3262 '                MRtn = InspInit()               '画像処理初期化処理
+3263 '            EndIf
+3264 '
+3265             M_20# = MClear%             '初期化
+3266 '組立開始
+3267             If M_In(MIN_ASSY_CANCEL%) = 0 Then
+3268                 fnAssyStart()
+3269             Else
+3270                 M_20# = MPass%
+3271             EndIf
+3272 '組立終了日付時刻
+3273             M_Out(MOUT_ED_DATETIME%) = 1    '組立終了日付時刻
+3274             Wait M_In(11572) = 1            '日付取得完了
+3275             Dly 0.1
+3276             M_Out(MOUT_ED_DATETIME%) = 0    '組立終了日付時刻
+3277 'リフターユニットへのOUT
+3278             '  KEY入力が何もない場合 OKと判断
+3279             fnAutoScreenComment(89)         'AUTO画面 組立処理完了
+3280             'MRet% = fnWindScreenOpen(MWindReSet, 0, 0, 89)  'AUTO画面 組立処理完了
+3281 'OK/NGフラグ出力
+3282             If M_20# <= 0 Then
+3283                 M_Out(MOUT_OKNG%) = 1       '後工程へOKフラグを出力(PLC OUT)
+3284             ElseIf M_20# = MPass% Then
+3285                 M_Out(MOUT_OKNG%) = 0       '後工程へNGフラグを出力(PLC OUT)
+3286             EndIf
+3287 'PIASに組立完了書込み
+3288             If M_In(MIN_PIAS_Use%) = 1 Then       'PIAS_ON確認
+3289                 If M_20# = MPass% Then
+3290                     M_Out(MOUT_OKNG%) = 0                   '後工程へNGフラグを出力(PLC OUT)
+3291                 Else
+3292                     'KEY入力がNGの場合
+3293                     If M_20# = MNgProcess% Then
+3294                         M_Out(MOUT_OKNG%) = 0                   '後工程へNGフラグを出力(PLC OUT)
+3295                         fnAutoScreenComment(90)  'AUTO画面 通過履歴NG書込み
+3296                         MRet% = fnPiasWrite(MNG%)
+3297                        nAssyNgQty = nAssyNgQty + 1
+3298                     EndIf
+3299                     '
+3300                     'KEY入力が何もない場合 OKと判断(MAssyOK%に変更1/17中村)
+3301                     If M_20# = MAssyOK% Then
+3302                             '-----------------------
+3303                             'D732 -> D2600 コピー要求
+3304                             M_Out(12566) = 1
+3305 '                            Wait M_In(11581) = 1   'PLCよりコピー完了信号
+3306                             M_Out(12566) = 0
+3307                             '
+3308                         If M_In(11367) = 0 Then          '基板履歴書込みキャンセル=1 DEbug用
+3309                             'MRet% = fnAutoScreenComment(91)  'AUTO画面 基板情報書込み
+3310                             '基板番号照合(PPは未使用）
+3311 '                            MRet% = fnPCBNumberCheck()
+3312                         Else
+3313                             MRet% = 1
+3314                         EndIf
+3315                         '
+3316                         If M_In(11368) = 0 Then          '工程履歴書込みキャンセル=1 DEbug用
+3317                             If M_20# <> MAbout% Then
+3318                                 '工程履歴OK書き込み
+3319                                 M_Out(MOUT_OKNG%) = 1                   '後工程へOKフラグを出力(PLC OUT)
+3320                                 fnAutoScreenComment(92)  'AUTO画面 通過履歴OK書込み
+3321                                 MRet% = fnPiasWrite(MOK%)
+3322                                 nAssyOkQty = 0
+3323                                 nAssyOkQty = nAssyOkQty + 1
+3324                             Else
+3325                                 nAssyOkQty = nAssyOkQty + 1
+3326                             EndIf
+3327                         EndIf
+3328                     EndIf
+3329 '                    fnAutoScreenComment(92)  'AUTO画面 通過履歴OK書込み
+3330 '                    MRet% = fnPiasWrite(MOK%)
+3331                 EndIf
+3332             Else
+3333                 nAssyOkQty = nAssyOkQty + 1
+3334             EndIf
+3335             '
+3336             '組立終了日付時刻解除
+3337             M_Out(MOUT_ED_DATETIME%) = 0                '組立終了日付時刻
+3338             '投入数、組立OK数、組立NG数書込み
+3339 '            MRtn = FnCtlValue2(2)                       '書込み 2022/04/28 コメントアウト 渡辺
+3340             '
+3341 '            If M_In(MIN_Insight_Use%) = 1 Then          'toRBT_使用確認
+3342 '                '画像処理終了処理
+3343 '                MRtn = InspQuit()
+3344 '            EndIf
+3345         EndIf
+3346         M_Out(12364) = 0                          'toPLC_データ保存OFF
+3347     EndIf
+3348 'パトライト操作
+3349     M_Out(MOUT_PATLIGHT_ON%) = 0                  'PATLIGHT操作権ON
+3350     M_Out(MOUT_GREEN_LIGHT%) = 0                  'PATLIGHT 青
+3351 'GOT表示
+3352     fnAutoScreenComment(93)  'AUTO画面 工程完了
+3353 FEnd
+3354 End
+3355 '
+3356 'おまじないコメント
+3357 '絶対削除するな
+3358 '
+3359 '
+3360 '
+3361 '
+3362 '
+3363 '
+3364 '
+JActive=(93.470,-14.830,113.090,0.170,81.440,182.960,0.000,0.000)
+Jmove=(93.470,-46.870,111.640,0.000,80.580,182.960,0.000,0.000)
+JTaihi=(0.000,-46.870,111.640,0.000,80.580,0.000,0.000,0.000)
+PActive=(602.000,-150.000,550.000,-180.000,0.000,90.000,0.000,0.000)(7,0)
+PInitialPosition=(340.000,0.000,580.000,-180.000,0.000,180.000)(7,0)
+PMechaGet=(-415.660,-8.740,299.320,179.450,-2.220,176.860)(7,1048577)
+PMechaGet_1=(-415.660,-8.740,409.960,179.450,-2.220,176.860)(7,1048577)
+PMechaGet_2=(-189.840,-0.010,629.060,-180.000,0.000,-179.990)(7,1)
+PMechaGet_3=(0.010,189.840,629.070,-180.000,0.000,90.000)(7,0)
+PMechaGet_4=(327.500,0.020,596.240,-179.990,0.000,103.500)(7,0)
+PMechaGet_5=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PMechaGet_6=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PMechaSet1=(159.800,-334.910,320.000,122.020,86.640,31.390)(6,0)
+PMechaSet1_1=(159.800,-334.910,340.000,122.020,86.640,31.390)(6,0)
+PMechaSet2=(160.190,-334.970,320.180,122.020,86.640,31.360)(6,0)
+PMechaSet2_1=(160.190,-334.970,339.970,122.020,86.640,31.360)(6,0)
+PMechaSet_2=(162.580,-305.370,557.380,179.470,90.000,89.470)(6,0)
+PMechaSet_3=(114.450,-288.220,565.580,180.000,0.000,112.110)(7,0)
+PMechaSet_4=(310.110,-0.040,565.560,180.000,0.000,-179.550)(7,0)
+PMechaSet_5=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PMechaSet_6=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+Pmove=(-20.940,188.680,640.000,-180.000,0.000,96.340,0.000,0.000)(7,0)
+PPlateBackCheck=(-90.210,513.030,577.720,-180.000,0.000,-90.000)(7,0)
+PPlateBackCheck_2=(66.390,429.860,577.750,180.000,0.000,-90.000)(7,0)
+PPlateBackCheck_3=(-18.780,286.220,630.880,180.000,0.000,-90.000)(7,0)
+PPlateBackCheck_4=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PPlateBackCheck_5=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PPlateBackCheck_6=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PPlateBackGet=(477.780,104.880,400.930,179.920,-0.070,179.070)(7,0)
+PPlateBackGet_1=(477.780,104.880,430.000,179.920,-0.070,179.070)(7,0)
+PPlateBackGet_2=(477.780,104.880,560.000,179.920,-0.070,179.070)(7,0)
+PPlateBackGet_3=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PPlateBackGet_4=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PPlateBackGet_5=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PPlateBackGet_6=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PPlateBackPush=(-18.720,415.610,534.990,179.960,0.000,88.990)(7,1048576)
+PPlateBackPush_1=(-18.720,400.000,534.990,179.960,0.000,88.990)(7,1048576)
+PPlateBackPush_2=(-17.580,398.810,550.570,179.960,0.000,88.990)(7,1048576)
+PPlateBackSet=(-17.580,456.120,539.500,-179.730,-11.000,88.560)(7,1048576)
+PPlateBackSet_1=(-17.580,449.110,537.790,-179.680,-13.000,88.560)(7,1048576)
+PPlateBackSet_10=(-17.620,351.380,478.080,-178.780,-45.000,88.590)(7,1048576)
+PPlateBackSet_11=(-17.620,346.000,478.080,-178.780,-45.000,88.590)(7,1048576)
+PPlateBackSet_12=(-17.620,345.820,487.160,179.690,-45.000,90.690)(7,1048576)
+PPlateBackSet_13=(-17.620,286.220,630.900,-179.820,-0.290,90.490)(7,1048576)
+PPlateBackSet_2=(-17.580,435.640,533.420,-179.580,-17.000,88.560)(7,1048576)
+PPlateBackSet_3=(-17.580,422.800,528.430,-179.470,-21.000,88.560)(7,1048576)
+PPlateBackSet_4=(-17.580,409.820,522.120,-179.370,-25.000,88.560)(7,1048576)
+PPlateBackSet_5=(-17.580,397.610,515.400,-179.260,-29.000,88.560)(7,1048576)
+PPlateBackSet_6=(-17.580,385.280,508.060,-179.140,-33.000,88.560)(7,1048576)
+PPlateBackSet_7=(-17.580,373.780,499.740,-179.030,-37.000,88.590)(7,1048576)
+PPlateBackSet_8=(-17.580,363.120,490.440,-178.910,-41.000,88.680)(7,1048576)
+PPlateBackSet_9=(-17.580,353.110,479.810,-178.780,-45.000,88.590)(7,1048576)
+PProductOnPltGet=(477.970,-98.800,372.680,179.760,-0.070,178.770)(7,0)
+PProductOnPltGet_1=(477.970,-98.800,410.000,179.760,-0.070,178.770)(7,0)
+PProductOnPltGet_2=(477.970,-98.800,500.000,179.760,-0.070,178.770)(7,0)
+PProductOnPltGet_3=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnPltGet_4=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnPltGet_5=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnPltGet_6=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnPltSet=(476.450,-98.290,372.680,179.790,-0.350,178.820)(7,0)
+PProductOnPltSet_1=(476.450,-98.290,410.000,179.790,-0.350,178.820)(7,0)
+PProductOnPltSet_2=(476.450,-98.290,500.000,179.790,-0.350,178.820)(7,0)
+PProductOnPltSet_3=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnPltSet_4=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnPltSet_5=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnPltSet_6=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnRoboGet=(-18.410,403.360,318.120,76.690,88.680,166.880)(6,0)
+PProductOnRoboGet_1=(-18.410,403.360,425.200,76.690,88.680,166.880)(6,0)
+PProductOnRoboGet_2=(-18.410,307.970,425.200,76.690,88.680,166.880)(6,0)
+PProductOnRoboGet_3=(-18.400,300.000,550.000,75.410,88.780,165.600)(6,0)
+PProductOnRoboGet_4=(-18.400,300.000,550.000,75.410,88.780,165.600)(6,0)
+PProductOnRoboGet_5=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnRoboGet_6=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnRoboSet=(-18.410,403.360,318.120,76.690,88.680,166.880)(6,0)
+PProductOnRoboSet_1=(-18.410,403.360,425.200,76.690,88.680,166.880)(6,0)
+PProductOnRoboSet_2=(-18.410,307.970,425.200,76.690,88.680,166.880)(6,0)
+PProductOnRoboSet_3=(-18.400,300.000,550.000,75.410,88.780,165.600)(6,0)
+PProductOnRoboSet_4=(-18.860,404.690,360.000,-102.740,89.080,-12.360)(6,0)
+PProductOnRoboSet_5=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PProductOnRoboSet_6=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PPushTilt=(-213.310,564.750,464.130,179.960,-0.020,1.510)(7,0)
+PPushTilt_1=(-213.310,564.750,480.780,179.960,-0.020,1.510)(7,0)
+PPushTilt_2=(-213.310,564.750,620.000,179.960,-0.020,1.510)(7,0)
+PPushTilt_3=(0.020,340.000,610.000,-180.000,-0.010,-91.910)(7,0)
+PTemp=(602.000,-150.000,550.000,-180.000,0.000,90.000,0.000,0.000)(7,0)
+PTicketRead=(602.000,-150.000,500.000,180.000,0.000,90.000)(7,0)
+PTicketRead_1=(602.000,-150.000,550.000,180.000,0.000,90.000)(7,0)
+PTicketRead_2=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PTicketRead_3=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PTicketRead_4=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PTicketRead_5=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PTicketRead_6=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)(0,0)
+PEscapePosi(1)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PEscapePosi(2)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PEscapePosi(3)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PEscapePosi(4)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PEscapePosi(5)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PEscapePosi(6)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PEscapePosi(7)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PEscapePosi(8)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PEscapePosi(9)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PEscapePosi(10)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(1)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(2)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(3)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(4)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(5)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(6)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(7)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(8)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(9)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PGetScrewPos(10)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(1)=(602.000,-150.000,500.000,180.000,0.000,90.000,0.000,0.000)(7,0)
+PInspPosition(2)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(3)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(4)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(5)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(6)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(7)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(8)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(9)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(10)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(11)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(12)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(13)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(14)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(15)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(16)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(17)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(18)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(19)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(20)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(21)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(22)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(23)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(24)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(25)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(26)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(27)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(28)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(29)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PInspPosition(30)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(1)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(2)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(3)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(4)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(5)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(6)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(7)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(8)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(9)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
+PScrewPos(10)=(0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000)
